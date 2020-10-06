@@ -6,5 +6,5 @@ launch.json
 
 
 // all services except example
-# services/*
+services/*
 !services/example
