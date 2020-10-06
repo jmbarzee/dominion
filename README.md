@@ -1,9 +1,9 @@
-# Domain
+# Dominion
 Golang Distributed System and Home Automation
 
-[![Build Status](https://travis-ci.com/jmbarzee/domain.svg?branch=master)](https://travis-ci.com/jmbarzee/domain)
-[![Go Report Card](https://goreportcard.com/badge/github.com/jmbarzee/domain)](https://goreportcard.com/report/github.com/jmbarzee/domain)
-[![GoDoc](https://godoc.org/github.com/jmbarzee/domain?status.svg)](https://godoc.org/github.com/jmbarzee/domain)
+[![Build Status](https://travis-ci.com/jmbarzee/dominion.svg?branch=master)](https://travis-ci.com/jmbarzee/dominion)
+[![Go Report Card](https://goreportcard.com/badge/github.com/jmbarzee/dominion)](https://goreportcard.com/report/github.com/jmbarzee/dominion)
+[![GoDoc](https://godoc.org/github.com/jmbarzee/dominion?status.svg)](https://godoc.org/github.com/jmbarzee/dominion)
 [![GPL Licence](https://badges.frapsoft.com/os/gpl/gpl.svg?v=103)](https://opensource.org/licenses/GPL-3.0/)
 
 <!--- Example of cards https://github.com/gonum/gonum --->
@@ -11,29 +11,48 @@ Golang Distributed System and Home Automation
 
 
 ## Purpose
-This library serves on an IoT network were services (lights, speakers, thermostat, cameras, processing...) will be auto-started, auto-distributed, and (maybe) auto-scaled. domain is the back bone of this process. Once a domain starts it will start its own services, enable service discovery and distribution, and communicate about which services it still needs. 
+This library serves on an IoT network were services (lights, speakers, thermostat, cameras, processing...) will be auto-started, auto-distributed, and (maybe) auto-scaled. The Dominion & Domains are sorts of managers of all devices which are participating. They manage service start, maintance, and discovery.
 
-Domains search for other domains (peers) by:
-1. Identifying that they are lonely (either can't heartbeat to them or had no peers to begin with)
-2. Broadcasting to the network using ZeroConf (advertizing a service with config.Title)
-3. Listening for incomming RPCs (ShareIdentityList() is the heartbeat rpc)
-4. Processing incomming identity lists by updating its peerMap
+## Dominion (leader)
+Run the Domain with `go run cmd/dominion/main.go`
+Don't forget to set `DOMINION_CONFIG_FILE` [example](../blob/master/cmd/dominion/ex.config.toml)
 
-Domains listen for other domains (peers) by:
-1. Listening for ZeroConf broadcasts (with service matching config.Title)
-2. Sending ShareIdentityList RPCs to the lonely domain
-3. Adding the new domain to its peerMap
+Listen for new Domains by:
+1. Wait for ZeroConf Broadcasts advertizing a Domain
+2. Dial Domain & establish lasting connection
 
-Domains maintain contact with other domains (peers) by:
-1. Checking to see if most recent contact is too old
-2. Checking and possible establishing a new connection with the domain (peer)
-3. Sending ShareIdentityList RPCs to the domain (peer)
-4. Processing the replied identity list by updating its peerMap
+Review Domains by:
+1. Repeadetly send heartbeat to Domains to keep connection alive
+2. Update Domains service list from heartbeat reply
 
-Domains processing identity lists by:
-1. Adding new identities as peers without connections
-2. Updating current peers information, like IP, Port, LastContact, and ServiceList
+Review Domain's Services by:
+1. Routinely reviewing Domains and checking that required services are available/started 
+2. Routinely reviewing Services and checking that dependencies are available/started
 
+
+
+## Domain (follower)
+Run the Domain with `go run cmd/domain/main.go`
+Don't forget to set `DOMAIN_CONFIG_FILE` [example](../blob/master/cmd/domain/ex.config.toml)
+
+Domains find a Dominion by:
+1. Identifying that they are lonely (no history of a dominion or heartbeats stopped)
+2. Broadcasting to the network using ZeroConf
+
+Domains remain in a Dominion by:
+1. Listening for incomming Heartbeat RPCs
+2. Update stored Dominion's identity 
+
+Domains start Services by:
+1. Listening for incomming StartService RPCs
+2. Calling make in the specified Service Directory
+
+
+
+## Service (Ecosystem) 
+Services do whatever you want them too. Services are language agnostic. They can locate other services through the Dominion's GRPC server. Service dependencies are defined in the `DOMINION_CONFIG_FILE`
+
+Services I use -> [ExMachina](github.com/jmbarzee/exmachina)
 
 
 ## Utilized Libraries
@@ -50,9 +69,8 @@ Domains processing identity lists by:
 
 ## Planned Development
 
-1. Service Sharing - strategies for service start and service dependency evaluation 
-2. Connection encryption - encrypt RPCs
-3. Identity verification - sign communication with preestablished keypairs
+1. Connection encryption - encrypt RPCs
+2. Identity verification - sign communication with preestablished keypairs
 
 
 

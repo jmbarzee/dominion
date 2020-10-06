@@ -3,3 +3,8 @@
 
 // vscode debug config
 launch.json
+
+
+// all services except example
+# services/*
+!services/example

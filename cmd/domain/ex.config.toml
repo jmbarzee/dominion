@@ -4,7 +4,8 @@ uuid = "GUID-0" # unique UUID
 port = 9000 # doesn't matter for the most part, the domain will find other domains on any functioning port
 
 traits = [
-	"compute",
+	"compute", # Represents some periphrial offered by the device, in this case compute power
+	"peripheral",
 ]
 
 # All timings are in Nanoseconds
