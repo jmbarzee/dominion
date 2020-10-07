@@ -66,7 +66,7 @@ Loop:
 	LogRoutinef(routineName, "Stopping routine")
 }
 
-// RequireEnv finds the value of the requried variable or panics
+// RequireEnv finds the value of the required variable or panics
 func RequireEnv(varName string) string {
 	value := os.Getenv(varName)
 	if value == "" {

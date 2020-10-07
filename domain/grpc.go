@@ -55,7 +55,7 @@ func (d *Domain) rpcHeartbeat(ctx context.Context, serviceGuard *service.Service
 		if err != nil {
 			return err
 		}
-		system.LogRPCf(rpcName, "Recieved reply")
+		system.LogRPCf(rpcName, "Received reply")
 
 		// Update domain
 		service.LastContact = time.Now()

@@ -13,6 +13,7 @@ import (
 )
 
 type (
+	// DomainConfig holds all the information required to start a Domain
 	DomainConfig struct {
 		// UUID is a unique identifier for a domain
 		UUID string
@@ -33,6 +34,7 @@ type (
 
 var domainConfig *DomainConfig
 
+// GetDominionConfig returns the singleton DominionConfig
 func GetDomainConfig() DomainConfig {
 	if domainConfig == nil {
 		system.Panic(errors.New("config.Setup has not ben called"))
@@ -40,6 +42,7 @@ func GetDomainConfig() DomainConfig {
 	return *domainConfig
 }
 
+// SetupFromTOML produces a default configuration
 func SetupFromTOML(configFilePath string) error {
 	if domainConfig != nil {
 		return errors.New("config.setupFromTOML has already been called")

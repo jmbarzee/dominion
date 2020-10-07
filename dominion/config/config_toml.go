@@ -1,6 +1,6 @@
 package config
 
-// SetupFromTOML produces a default configuration which can be passed to New()
+// SetupFromTOML produces a default configuration
 func SetupFromTOML(configFilePath string) error {
 	if err := setupDominionConfigFromTOML(configFilePath); err != nil {
 		return err

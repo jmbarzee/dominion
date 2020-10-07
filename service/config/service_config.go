@@ -19,7 +19,7 @@ type ServiceConfig struct {
 // DefaultServiceDialTimeout is the default time out for grpc dial operations
 const DefaultServiceDialTimeout = time.Millisecond * 100
 
-// FromEnv builds a ServiceConfig from the enviornment and arguments
+// FromEnv builds a ServiceConfig from the environment and arguments
 func FromEnv(serviceType string) (config ServiceConfig, err error) {
 	dominionIPString := os.Args[1]
 	dominionIP := net.ParseIP(dominionIPString)

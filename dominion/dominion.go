@@ -11,6 +11,11 @@ import (
 	"github.com/jmbarzee/dominion/system"
 )
 
+// Dominion is the leader of the Domains
+// The Dominion is responsisble for:
+//  - Listen for broadcasts from new/lonely Domains
+//  - Heartbeats to connected Domains
+//  - Command Domains to start new services
 type Dominion struct {
 
 	// domains is a map of domains the dominion currently contains
@@ -60,6 +65,8 @@ func NewDominionIdentity(port int) (identity.DominionIdentity, error) {
 	}, nil
 }
 
+// Run begins all the Dominion routines.
+// Run doesn't return unless the Dominion has been ended
 func (d Dominion) Run(ctx context.Context) error {
 
 	// Intro log

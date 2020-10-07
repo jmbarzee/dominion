@@ -11,6 +11,7 @@ import (
 	"github.com/jmbarzee/dominion/system"
 )
 
+// Start calls make from the services directory to start a new service
 func Start(serviceType string, ip net.IP, dominionPort int, domainUUID string, servicePort int) error {
 	system.Logf("Starting %v!", serviceType)
 

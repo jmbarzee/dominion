@@ -45,7 +45,7 @@ func (s Service) RPCGetServices(ctx context.Context, serviceType string) ([]iden
 		if err != nil {
 			return err
 		}
-		system.LogRPCf(rpcName, "Recieved reply")
+		system.LogRPCf(rpcName, "Received reply")
 
 		services = identity.NewServiceIdentityList(reply.GetServices())
 		return nil
