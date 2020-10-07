@@ -1,10 +1,8 @@
 [![License: AGPL](https://img.shields.io/badge/license-AGPL-blue.svg)][license]
 [![Documentation](https://godoc.org/github.com/jmbarzee/dominion?status.svg)][docs]
-
-[![Build](https://github.com/jmbarzee/dominion/workflows/Test/badge.svg)][status]
-[![Coverage](https://codecov.io/gh/jmbarzee/dominion/branch/master/graph/badge.svg)][coverage]
 [![Code Quality](https://goreportcard.com/badge/github.com/jmbarzee/dominion)][goreport]
-
+[![Build](https://github.com/jmbarzee/dominion/workflows/ci/badge.svg)][status]
+[![Coverage](https://codecov.io/gh/jmbarzee/dominion/branch/master/graph/badge.svg)][coverage]
 
 
 
