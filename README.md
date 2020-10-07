@@ -6,7 +6,7 @@
 
 
 # Dominion
-Golang Distributed System and Home Automation
+Golang distributed system for service ecosystem management
 
 This library serves on an IoT network were services (lights, speakers, thermostat, cameras, processing...) will be auto-started, auto-distributed, and (maybe) auto-scaled. The Dominion & Domains are sorts of managers of all devices which are participating. They manage service start, maintance, and discovery.
 
