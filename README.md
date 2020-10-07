@@ -1,6 +1,13 @@
-[![Build Status](https://travis-ci.com/jmbarzee/dominion.svg?branch=master)](https://travis-ci.com/jmbarzee/dominion)
-[![Go Report Card](https://goreportcard.com/badge/github.com/jmbarzee/dominion)](https://goreportcard.com/report/github.com/jmbarzee/dominion)
-[![GoDoc](https://godoc.org/github.com/jmbarzee/dominion?status.svg)](https://godoc.org/github.com/jmbarzee/dominion)
+<p align="center">
+[![License: AGPL](https://img.shields.io/badge/license-AGPL-blue.svg)][license]
+[![Documentation](https://godoc.org/github.com/jmbarzee/dominion?status.svg)][docs]
+
+[![Status](https://github.com/jmbarzee/dominion/workflows/CI/badge.svg)[status]
+[![Coverage](https://codecov.io/gh/jmbarzee/dominion/branch/master/graph/badge.svg)][coverage]
+[![Code Quality](https://goreportcard.com/badge/github.com/jmbarzee/dominion)][goreport]
+</p>
+
+
 
 
 # Dominion
@@ -73,3 +80,9 @@ Services I use -> [ExMachina](github.com/jmbarzee/exmachina)
 
 
 
+[license]: https://opensource.org/licenses/GPL-3.0/
+[docs]: (https://godoc.org/github.com/jmbarzee/dominion)
+
+[status]: (https://github.com/jmbarzee/dominion/actions)
+[coverage]: (https://codecov.io/gh/jmbarzee/dominion)
+[goreport]: https://goreportcard.com/report/github.com/jmbarzee/dominion
