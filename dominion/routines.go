@@ -91,7 +91,7 @@ Loop:
 
 func (d *Dominion) checkDomains(ctx context.Context) {
 	d.domains.Range(func(uuid string, domainGuard *domain.DomainGuard) bool {
-		domainGuard.LatchRead(func(domain *domain.Domain) error {
+		domainGuard.LatchRead(func(domain domain.Domain) error {
 			if time.Since(domain.LastContact) > config.GetDominionConfig().DomainCheck*10 {
 				// its been a while, make sure they are still alive
 				go d.rpcHeartbeat(ctx, domainGuard)
@@ -107,7 +107,7 @@ func (d *Dominion) checkServices(ctx context.Context) {
 	dependencies := make(map[string]int)
 
 	d.domains.Range(func(uuid string, domainGuard *domain.DomainGuard) bool {
-		domainGuard.LatchRead(func(domain *domain.Domain) error {
+		domainGuard.LatchRead(func(domain domain.Domain) error {
 
 			// check for requiredServices
 			for serviceType, serviceDef := range requiredServices {

@@ -18,7 +18,7 @@ import (
 
 func (d *Domain) checkServices(ctx context.Context) {
 	d.services.Range(func(uuid string, serviceGuard *service.ServiceGuard) bool {
-		serviceGuard.LatchRead(func(service *service.Service) error {
+		serviceGuard.LatchRead(func(service service.Service) error {
 			if time.Since(service.LastContact) > config.GetDomainConfig().ServiceCheck*10 {
 				// its been a while, make sure they are still alive
 				go d.rpcHeartbeat(ctx, serviceGuard)

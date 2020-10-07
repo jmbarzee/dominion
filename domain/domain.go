@@ -86,7 +86,7 @@ func (d Domain) packageDomainIdentity() identity.DomainIdentity {
 	ident := d.DomainIdentity
 	ident.Services = make(map[string]identity.ServiceIdentity)
 	d.services.Range(func(serviceType string, serviceGuard *service.ServiceGuard) bool {
-		serviceGuard.LatchRead(func(service *service.Service) error {
+		serviceGuard.LatchRead(func(service service.Service) error {
 			ident.Services[serviceType] = service.ServiceIdentity
 			return nil
 		})

@@ -78,7 +78,7 @@ func (d *Dominion) packageDomains() []identity.DomainIdentity {
 	domainIdents := make([]identity.DomainIdentity, 0)
 
 	d.domains.Range(func(uuid string, domainGuard *domain.DomainGuard) bool {
-		domainGuard.LatchRead(func(domain *domain.Domain) error {
+		domainGuard.LatchRead(func(domain domain.Domain) error {
 			domainIdents = append(domainIdents, domain.DomainIdentity)
 			return nil
 		})
@@ -92,7 +92,7 @@ func (d *Dominion) findService(serviceTypeRequested string) []identity.ServiceId
 	serviceIdents := make([]identity.ServiceIdentity, 0)
 
 	d.domains.Range(func(uuid string, domainGuard *domain.DomainGuard) bool {
-		domainGuard.LatchRead(func(domain *domain.Domain) error {
+		domainGuard.LatchRead(func(domain domain.Domain) error {
 			serviceIdent, ok := domain.Services[serviceTypeRequested]
 			if ok {
 				serviceIdents = append(serviceIdents, serviceIdent)
@@ -110,7 +110,7 @@ func (d *Dominion) findServiceCanidates(serviceTypeRequested string) []identity.
 	domainIdents := make([]identity.DomainIdentity, 0)
 
 	d.domains.Range(func(uuid string, domainGuard *domain.DomainGuard) bool {
-		domainGuard.LatchRead(func(domain *domain.Domain) error {
+		domainGuard.LatchRead(func(domain domain.Domain) error {
 			if domain.HasTraits(traitsNeeded) {
 				domainIdents = append(domainIdents, domain.DomainIdentity)
 			}
