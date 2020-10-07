@@ -17,4 +17,13 @@ jobs:
       uses: actions/checkout@v2
       
     - name: Test
-      run: go test ./...
+      run: go test ./... -coverprofile cover.info
+
+    - name: Codecov
+      run: |
+        if [ -n "$CODECOV_TOKEN" ]; then
+          curl -s https://codecov.io/bash | bash -s -- -t $CODECOV_TOKEN -f $COVERAGE_FILE
+        fi
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        COVERAGE_FILE: ./cover.info

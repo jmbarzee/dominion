@@ -1,9 +1,8 @@
-[![License: AGPL](https://img.shields.io/badge/license-AGPL-blue.svg)][license]
-[![Documentation](https://godoc.org/github.com/jmbarzee/dominion?status.svg)][docs]
-[![Code Quality](https://goreportcard.com/badge/github.com/jmbarzee/dominion)][goreport]
-[![Build](https://github.com/jmbarzee/dominion/workflows/build/badge.svg)][status]
-[![Coverage](https://codecov.io/gh/jmbarzee/dominion/branch/master/graph/badge.svg)][coverage]
-
+[![License: AGPL](https://img.shields.io/badge/license-AGPL-blue.svg)](https://opensource.org/licenses/GPL-3.0/)
+[![Documentation](https://godoc.org/github.com/jmbarzee/dominion?status.svg)](https://godoc.org/github.com/jmbarzee/dominion)
+[![Code Quality](https://goreportcard.com/badge/github.com/jmbarzee/dominion)](https://goreportcard.com/report/github.com/jmbarzee/dominion)
+[![Build Status](https://github.com/jmbarzee/dominion/workflows/build/badge.svg)](https://github.com/jmbarzee/dominion/actions)
+[![Coverage](https://codecov.io/gh/jmbarzee/dominion/branch/master/graph/badge.svg)](https://codecov.io/gh/jmbarzee/dominion)
 
 
 # Dominion
@@ -73,12 +72,3 @@ Services I use -> [ExMachina](github.com/jmbarzee/exmachina)
 
 1. Connection encryption - encrypt RPCs
 2. Identity verification - sign communication with preestablished keypairs
-
-
-
-[license]: https://opensource.org/licenses/GPL-3.0/
-[docs]: (https://godoc.org/github.com/jmbarzee/dominion)
-
-[status]: (https://github.com/jmbarzee/dominion/actions)
-[coverage]: (https://codecov.io/gh/jmbarzee/dominion)
-[goreport]: https://goreportcard.com/report/github.com/jmbarzee/dominion
