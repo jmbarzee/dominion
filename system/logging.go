@@ -94,6 +94,6 @@ func Errorf(fmts string, args ...interface{}) {
 	if logger == nil {
 		panic(errors.New("system.Setup has not been called"))
 	}
-	err := fmt.Errorf(fmts, args)
+	err := fmt.Errorf(fmts, args...)
 	logger.Printf("Error: %v", err)
 }
