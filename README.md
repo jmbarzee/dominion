@@ -13,7 +13,7 @@ This library serves on an IoT network were services (lights, speakers, thermosta
 ### Dominion (leader)
 Run the Domain with `go run cmd/dominion/main.go`
 
-Don't forget to set `DOMINION_CONFIG_FILE` [example](../master/cmd/dominion/ex.config.toml)
+Don't forget to set `DOMINION_CONFIG_FILE` [example](../main/cmd/dominion/ex.config.toml)
 
 Listen for new Domains by:
 1. Wait for ZeroConf Broadcasts advertizing a Domain
@@ -32,7 +32,7 @@ Review Domain's Services by:
 ### Domain (follower)
 Run the Domain with `go run cmd/domain/main.go`
 
-Don't forget to set `DOMAIN_CONFIG_FILE` [example](../master/cmd/domain/ex.config.toml)
+Don't forget to set `DOMAIN_CONFIG_FILE` [example](../main/cmd/domain/ex.config.toml)
 
 Domains find a Dominion by:
 1. Identifying that they are lonely (no history of a dominion or heartbeats stopped)
