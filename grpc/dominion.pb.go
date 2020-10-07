@@ -219,7 +219,7 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type DominionClient interface {
-	// GetServices returns the availible services and their locations
+	// GetServices returns the available services and their locations
 	GetServices(ctx context.Context, in *GetServicesRequest, opts ...grpc.CallOption) (*GetServicesReply, error)
 	// GetDomains returns all domains and their services
 	GetDomains(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetDomainsReply, error)
@@ -253,7 +253,7 @@ func (c *dominionClient) GetDomains(ctx context.Context, in *Empty, opts ...grpc
 
 // DominionServer is the server API for Dominion service.
 type DominionServer interface {
-	// GetServices returns the availible services and their locations
+	// GetServices returns the available services and their locations
 	GetServices(context.Context, *GetServicesRequest) (*GetServicesReply, error)
 	// GetDomains returns all domains and their services
 	GetDomains(context.Context, *Empty) (*GetDomainsReply, error)

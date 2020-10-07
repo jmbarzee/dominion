@@ -5,7 +5,7 @@ package grpcd;
 import "identity.proto";
 
 service Dominion {
-	// GetServices returns the availible services and their locations
+	// GetServices returns the available services and their locations
 	rpc GetServices (GetServicesRequest) returns (GetServicesReply) {}
 
 	// GetDomains returns all domains and their services

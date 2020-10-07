@@ -16,7 +16,7 @@ import (
 // GetServices is called by services hosted on a single domain to find their dependencies.
 func (d *Dominion) GetServices(ctx context.Context, request *grpc.GetServicesRequest) (*grpc.GetServicesReply, error) {
 	rpcName := "GetServices"
-	system.LogRPCf(rpcName, "Receving request")
+	system.LogRPCf(rpcName, "Receiving request")
 	reply := &grpc.GetServicesReply{
 		Services: identity.NewPBServiceIdentityList(d.findService(request.Type)),
 	}
@@ -27,7 +27,7 @@ func (d *Dominion) GetServices(ctx context.Context, request *grpc.GetServicesReq
 // GetDomains implements grpc and returns all domains and their services
 func (d *Dominion) GetDomains(ctx context.Context, request *grpc.Empty) (*grpc.GetDomainsReply, error) {
 	rpcName := "GetAllServices"
-	system.LogRPCf(rpcName, "Receving request")
+	system.LogRPCf(rpcName, "Receiving request")
 	reply := &grpc.GetDomainsReply{
 		Domains: identity.NewPBDomainIdentityList(d.packageDomains()),
 	}

@@ -32,6 +32,7 @@ type (
 
 var dominionConfig *DominionConfig
 
+// GetDominionConfig returns the singleton DominionConfig
 func GetDominionConfig() DominionConfig {
 	if dominionConfig == nil {
 		system.Panic(errors.New("config.Setup has not ben called"))

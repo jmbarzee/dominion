@@ -19,7 +19,7 @@ import (
 // Heartbeat serves as the heartbeat from a dominion.
 func (d *Domain) Heartbeat(ctx context.Context, request *grpc.HeartbeatRequest) (*grpc.HeartbeatReply, error) {
 	rpcName := "Heartbeat"
-	system.LogRPCf(rpcName, "Receving request")
+	system.LogRPCf(rpcName, "Receiving request")
 	if err := d.updateDominion(identity.NewDominionIdentity(request.GetDominion())); err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (d *Domain) rpcHeartbeat(ctx context.Context, serviceGuard *service.Service
 // StartService implements grpc and initiates a service in the domain.
 func (d *Domain) StartService(ctx context.Context, request *grpc.StartServiceRequest) (*grpc.StartServiceReply, error) {
 	rpcName := "StartService"
-	system.LogRPCf(rpcName, "Receving request")
+	system.LogRPCf(rpcName, "Receiving request")
 	ident, err := d.startService(request.GetType())
 	if err != nil {
 		err := fmt.Errorf("Failed to start service: %w", err)

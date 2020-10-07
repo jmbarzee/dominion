@@ -23,6 +23,7 @@ func NewServiceGuard(identity identity.ServiceIdentity) *ServiceGuard {
 	}
 }
 
+// LatchWrite offers write access to the Service
 func (d *ServiceGuard) LatchWrite(operation func(*Service) error) error {
 	d.rwmutex.Lock()
 	err := operation(&d.service)
@@ -30,9 +31,10 @@ func (d *ServiceGuard) LatchWrite(operation func(*Service) error) error {
 	return err
 }
 
-func (d *ServiceGuard) LatchRead(operation func(*Service) error) error {
+// LatchRead offers read access to the Service
+func (d *ServiceGuard) LatchRead(operation func(Service) error) error {
 	d.rwmutex.RLock()
-	err := operation(&d.service)
+	err := operation(d.service)
 	d.rwmutex.RUnlock()
 	return err
 }

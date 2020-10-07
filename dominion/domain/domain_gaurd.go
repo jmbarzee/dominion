@@ -23,6 +23,7 @@ func NewDomainGuard(identity identity.DomainIdentity) *DomainGuard {
 	}
 }
 
+// LatchWrite offers write access to the Domain
 func (d *DomainGuard) LatchWrite(operation func(*Domain) error) error {
 	d.rwmutex.Lock()
 	err := operation(&d.domain)
@@ -30,9 +31,10 @@ func (d *DomainGuard) LatchWrite(operation func(*Domain) error) error {
 	return err
 }
 
-func (d *DomainGuard) LatchRead(operation func(*Domain) error) error {
+// LatchRead offers read access to the Domain
+func (d *DomainGuard) LatchRead(operation func(Domain) error) error {
 	d.rwmutex.RLock()
-	err := operation(&d.domain)
+	err := operation(d.domain)
 	d.rwmutex.RUnlock()
 	return err
 }

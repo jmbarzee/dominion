@@ -14,7 +14,7 @@ import (
 // Heartbeat serves as the heartbeat from a dominion.
 func (s *Service) Heartbeat(ctx context.Context, request *pb.ServiceHeartbeatRequest) (*pb.ServiceHeartbeatReply, error) {
 	rpcName := "Heartbeat"
-	system.LogRPCf(rpcName, "Receving request")
+	system.LogRPCf(rpcName, "Receiving request")
 
 	// Prepare reply
 	reply := &pb.ServiceHeartbeatReply{
