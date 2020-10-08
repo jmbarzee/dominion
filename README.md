@@ -70,5 +70,6 @@ Services I use -> [ExMachina](github.com/jmbarzee/exmachina)
 
 ## Planned Development
 
-1. Connection encryption - encrypt RPCs
-2. Identity verification - sign communication with preestablished keypairs
+1. Expose Logfiles - Dominion & Domain offer routes with logfiles
+2. Connection encryption - encrypt RPCs
+3. Identity verification - sign communication with preestablished keypairs
