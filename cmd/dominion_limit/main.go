@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"runtime"
+	"time"
 
 	"github.com/jmbarzee/dominion/dominion"
 	"github.com/jmbarzee/dominion/dominion/config"
@@ -24,7 +25,10 @@ func main() {
 		panic(err)
 	}
 
-	if err := dominion.Run(context.Background()); err != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
+	defer cancel()
+
+	if err := dominion.Run(ctx); err != nil {
 		panic(err)
 	}
 }
