@@ -104,7 +104,12 @@ func (d *Domain) startService(serviceType string) (identity.ServiceIdentity, err
 	domainUUID := d.UUID
 	servicePort := (rand.Intn(uint16Max) + d.Address.Port) % uint16Max
 
-	err := service.Start(serviceType, dominionIP, dominionPort, domainUUID, servicePort)
+	err := service.Build(serviceType)
+	if err != nil {
+		return identity.ServiceIdentity{}, err
+	}
+
+	err = service.Start(serviceType, dominionIP, dominionPort, domainUUID, servicePort)
 	if err != nil {
 		return identity.ServiceIdentity{}, err
 	}

@@ -11,11 +11,12 @@ import (
 	"github.com/jmbarzee/dominion/system"
 )
 
+const rootPath = "/usr/local/dominion/services"
+
 // Start calls make from the services directory to start a new service
 func Start(serviceType string, ip net.IP, dominionPort int, domainUUID string, servicePort int) error {
 	system.Logf("Starting %v!", serviceType)
 
-	rootPath := "/usr/local/dominion/services"
 	makefilePath := path.Join(rootPath, strings.ToLower(serviceType))
 	makePath, err := exec.LookPath("make")
 	if err != nil {
@@ -25,6 +26,7 @@ func Start(serviceType string, ip net.IP, dominionPort int, domainUUID string, s
 	cmd := exec.Command(
 		makePath,
 		"-C", makefilePath,
+		"start",
 		"DOMINION_IP="+ip.String(),
 		"DOMINION_PORT="+strconv.Itoa(dominionPort),
 		"DOMAIN_UUID="+domainUUID,
@@ -37,16 +39,29 @@ func Start(serviceType string, ip net.IP, dominionPort int, domainUUID string, s
 		return err
 	}
 
-	// fmt.Println(cmd.Dir)
-	// fmt.Println(cmd.Path)
-	// fmt.Println(cmd.Args)
+	return nil
+}
 
-	// bytes, err := cmd.Output()
-	// if err != nil {
-	// 	fmt.Println("Error: ", err)
-	// 	return err
-	// }
-	// fmt.Printf("Output: %s", bytes)
+// Build calls make from the services directory to build a new service
+func Build(serviceType string) error {
+	system.Logf("Building %v!", serviceType)
+
+	makefilePath := path.Join(rootPath, strings.ToLower(serviceType))
+	makePath, err := exec.LookPath("make")
+	if err != nil {
+		return fmt.Errorf("make was not found in path: %w", err)
+	}
+
+	cmd := exec.Command(
+		makePath,
+		"-C", makefilePath,
+		"build")
+
+	err = cmd.Start()
+	if err != nil {
+		fmt.Printf(err.Error())
+		return err
+	}
 
 	return nil
 }
