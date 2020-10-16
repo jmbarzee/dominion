@@ -67,6 +67,7 @@ func (d *Dominion) rpcHeartbeat(ctx context.Context, domainGuard *domain.DomainG
 	})
 
 	if err != nil {
+		system.Errorf("Dropping Domain %s: %w", uuid, err)
 		d.domains.Delete(uuid)
 	}
 }
