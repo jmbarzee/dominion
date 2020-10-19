@@ -48,9 +48,9 @@ func GetOutboundIP() (net.IP, error) {
 	return localAddr.IP, nil
 }
 
-// RoutineCheck offers repeatedly runs check and then waits for wait.
+// RoutineOperation offers repeatedly runs check and then waits for wait.
 // cancleing ctx will end the check
-func RoutineCheck(ctx context.Context, routineName string, wait time.Duration, check func(context.Context)) {
+func RoutineOperation(ctx context.Context, routineName string, wait time.Duration, check func(context.Context)) {
 	LogRoutinef(routineName, "Starting routine")
 	ticker := time.NewTicker(wait)
 

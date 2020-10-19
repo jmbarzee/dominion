@@ -76,8 +76,8 @@ func (d Domain) Run(ctx context.Context) error {
 	system.Logf("The Dominion ever expands!\n")
 
 	// Start Auto Connecting Routines
-	go system.RoutineCheck(ctx, "checkIsolation", config.GetDomainConfig().IsolationCheck, d.checkIsolation)
-	go system.RoutineCheck(ctx, "checkServices", config.GetDomainConfig().ServiceCheck, d.checkServices)
+	go system.RoutineOperation(ctx, "checkIsolation", config.GetDomainConfig().IsolationCheck, d.checkIsolation)
+	go system.RoutineOperation(ctx, "checkServices", config.GetDomainConfig().ServiceCheck, d.checkServices)
 
 	return d.hostDomain(ctx)
 }

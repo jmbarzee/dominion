@@ -75,8 +75,8 @@ func (d Dominion) Run(ctx context.Context) error {
 	system.Logf("The Dominion ever expands!\n")
 
 	// Start Routines
-	go system.RoutineCheck(ctx, "checkDomains", config.GetDominionConfig().DomainCheck, d.checkDomains)
-	go system.RoutineCheck(ctx, "checkServices", config.GetDominionConfig().ServiceCheck, d.checkServices)
+	go system.RoutineOperation(ctx, "checkDomains", config.GetDominionConfig().DomainCheck, d.checkDomains)
+	go system.RoutineOperation(ctx, "checkServices", config.GetDominionConfig().ServiceCheck, d.checkServices)
 	go d.listenForBroadcasts(ctx)
 
 	return d.hostDominion(ctx)
