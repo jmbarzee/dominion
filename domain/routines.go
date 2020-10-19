@@ -16,7 +16,7 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-func (d *Domain) checkServices(ctx context.Context) {
+func (d *Domain) checkServices(ctx context.Context, _ time.Time) {
 	d.services.Range(func(uuid string, serviceGuard *service.ServiceGuard) bool {
 		serviceGuard.LatchRead(func(service service.Service) error {
 			if time.Since(service.LastContact) > config.GetDomainConfig().ServiceCheck*10 {
@@ -29,7 +29,7 @@ func (d *Domain) checkServices(ctx context.Context) {
 	})
 }
 
-func (d *Domain) checkIsolation(ctx context.Context) {
+func (d *Domain) checkIsolation(ctx context.Context, _ time.Time) {
 	var shouldBeBroadcasting bool
 	if d.Dominion == nil {
 		shouldBeBroadcasting = true

@@ -73,23 +73,7 @@ Loop:
 	system.LogRoutinef(routineName, "Stopping routine")
 }
 
-func (d *Dominion) routineCheck(ctx context.Context, routineName string, wait time.Duration, check func(context.Context)) {
-	system.LogRoutinef(routineName, "Starting routine")
-	ticker := time.NewTicker(wait)
-
-Loop:
-	for {
-		select {
-		case <-ticker.C:
-			check(ctx)
-		case <-ctx.Done():
-			break Loop
-		}
-	}
-	system.LogRoutinef(routineName, "Stopping routine")
-}
-
-func (d *Dominion) checkDomains(ctx context.Context) {
+func (d *Dominion) checkDomains(ctx context.Context, _ time.Time) {
 	d.domains.Range(func(uuid string, domainGuard *domain.DomainGuard) bool {
 		domainGuard.LatchRead(func(domain domain.Domain) error {
 			if time.Since(domain.LastContact) > config.GetDominionConfig().DomainCheck*10 {
@@ -102,7 +86,7 @@ func (d *Dominion) checkDomains(ctx context.Context) {
 	})
 }
 
-func (d *Dominion) checkServices(ctx context.Context) {
+func (d *Dominion) checkServices(ctx context.Context, _ time.Time) {
 	requiredServices := config.GetServicesConfig().GetRequiredServices()
 	dependencies := make(map[string]int)
 
