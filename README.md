@@ -3,6 +3,7 @@
 [![Code Quality](https://goreportcard.com/badge/github.com/jmbarzee/dominion)](https://goreportcard.com/report/github.com/jmbarzee/dominion)
 [![Build Status](https://github.com/jmbarzee/dominion/workflows/build/badge.svg)](https://github.com/jmbarzee/dominion/actions)
 [![Coverage](https://codecov.io/gh/jmbarzee/dominion/branch/master/graph/badge.svg)](https://codecov.io/gh/jmbarzee/dominion)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fjmbarzee%2Fdominion.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fjmbarzee%2Fdominion?ref=badge_shield)
 
 
 # Dominion
