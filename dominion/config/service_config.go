@@ -16,15 +16,13 @@ type (
 
 	// ServiceDefinition defines a single service in the service hiarchy
 	ServiceDefinition struct {
-		// Priority is the priority of the service
-		Priority Priority
+		// DockerImage is the image:tag of the service which can be pulled and started
+		DockerImage string
 		// Dependencies is the list of service types which this service depends on
 		Dependencies []string
 		// Traits is the list of triats required by a domain to be able to run a service
 		Traits []string
 	}
-
-	Priority string
 )
 
 var servicesConfig *ServicesConfig
@@ -59,23 +57,8 @@ func setupServicesConfigFromTOML(configFilePath string) error {
 	return nil
 }
 
-func (c ServicesConfig) GetRequiredServices() map[string]ServiceDefinition {
-	requiredServices := make(map[string]ServiceDefinition, 0)
-	for serviceType, serviceDef := range c.Services {
-		if serviceDef.IsRequired() {
-			requiredServices[serviceType] = serviceDef
-		}
-	}
-	return requiredServices
-}
-
-const (
-	Required   Priority = "required"
-	Dependency Priority = "dependency"
-)
-
 func (s ServiceDefinition) String() string {
-	msg := "(" + string(s.Priority) + ", ["
+	msg := "(" + string(s.DockerImage) + ", ["
 
 	for _, dependency := range s.Dependencies {
 		msg += dependency + ", "
@@ -88,8 +71,4 @@ func (s ServiceDefinition) String() string {
 	msg += "])"
 
 	return msg
-}
-
-func (s ServiceDefinition) IsRequired() bool {
-	return s.Priority == Required
 }

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.com/jmbarzee/dominion";
+option go_package = "github.com/jmbarzee/dominion/grpc";
 package grpc;
 
 

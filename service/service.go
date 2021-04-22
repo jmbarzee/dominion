@@ -17,6 +17,9 @@ type (
 	// the specific service should implement myService.Run(ctx)
 	// and should return myService.HostService() (blocking) as its final line
 	Service struct {
+		// UnimplementedServiceServer is embedded to enable forwards compatability
+		pb.UnimplementedServiceServer
+
 		UUID string
 
 		identity.ServiceIdentity

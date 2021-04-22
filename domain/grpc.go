@@ -73,7 +73,7 @@ func (d *Domain) rpcHeartbeat(ctx context.Context, serviceGuard *service.Service
 func (d *Domain) StartService(ctx context.Context, request *grpc.StartServiceRequest) (*grpc.StartServiceReply, error) {
 	rpcName := "StartService"
 	system.LogRPCf(rpcName, "Receiving request")
-	ident, err := d.startService(request.GetType())
+	ident, err := d.startService(request.GetType(), request.GetDockerImage())
 	if err != nil {
 		err := fmt.Errorf("Failed to start service: %w", err)
 		system.Errorf("Error starting service: %w", err)
@@ -88,7 +88,7 @@ func (d *Domain) StartService(ctx context.Context, request *grpc.StartServiceReq
 	return reply, nil
 }
 
-func (d *Domain) startService(serviceType string) (identity.ServiceIdentity, error) {
+func (d *Domain) startService(serviceType, dockerImage string) (identity.ServiceIdentity, error) {
 	if _, ok := d.services.Load(serviceType); ok {
 		return identity.ServiceIdentity{}, fmt.Errorf("Service already exists! (%s)", serviceType)
 	}
@@ -104,12 +104,7 @@ func (d *Domain) startService(serviceType string) (identity.ServiceIdentity, err
 	domainUUID := d.UUID
 	servicePort := (rand.Intn(uint16Max) + d.Address.Port) % uint16Max
 
-	err := service.Build(serviceType)
-	if err != nil {
-		return identity.ServiceIdentity{}, err
-	}
-
-	err = service.Start(serviceType, dominionIP, dominionPort, domainUUID, servicePort)
+	err := service.Start(serviceType, dockerImage, dominionIP, dominionPort, domainUUID, servicePort)
 	if err != nil {
 		return identity.ServiceIdentity{}, err
 	}

@@ -7,6 +7,7 @@ import (
 	"github.com/blang/semver"
 	"github.com/jmbarzee/dominion/dominion/config"
 	"github.com/jmbarzee/dominion/dominion/domain"
+	grpc "github.com/jmbarzee/dominion/grpc"
 	"github.com/jmbarzee/dominion/identity"
 	"github.com/jmbarzee/dominion/system"
 )
@@ -17,6 +18,8 @@ import (
 //  - Heartbeats to connected Domains
 //  - Command Domains to start new services
 type Dominion struct {
+	// UnimplementedDominionServer is embedded to enable forwards compatability
+	grpc.UnimplementedDominionServer
 
 	// domains is a map of domains the dominion currently contains
 	domains domain.DomainMap

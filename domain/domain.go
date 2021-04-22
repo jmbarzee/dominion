@@ -9,12 +9,16 @@ import (
 	"github.com/jmbarzee/dominion/domain/config"
 	"github.com/jmbarzee/dominion/domain/dominion"
 	"github.com/jmbarzee/dominion/domain/service"
+	grpc "github.com/jmbarzee/dominion/grpc"
 	"github.com/jmbarzee/dominion/identity"
 	"github.com/jmbarzee/dominion/system"
 )
 
 type (
 	Domain struct {
+		// UnimplementedDomainServer is embedded to enable forwards compatability
+		grpc.UnimplementedDomainServer
+
 		identity.DomainIdentity
 
 		Dominion *dominion.DominionGuard

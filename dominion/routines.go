@@ -87,21 +87,10 @@ func (d *Dominion) checkDomains(ctx context.Context, _ time.Time) {
 }
 
 func (d *Dominion) checkServices(ctx context.Context, _ time.Time) {
-	requiredServices := config.GetServicesConfig().GetRequiredServices()
 	dependencies := make(map[string]int)
 
 	d.domains.Range(func(uuid string, domainGuard *domain.DomainGuard) bool {
 		domainGuard.LatchRead(func(domain domain.Domain) error {
-
-			// check for requiredServices
-			for serviceType, serviceDef := range requiredServices {
-				if _, ok := domain.Services[serviceType]; ok {
-					continue // Already hosting service
-				}
-				if domain.HasTraits(serviceDef.Traits) {
-					go d.rpcStartService(ctx, domainGuard, serviceType)
-				}
-			}
 
 			// find service dependencies
 			for serviceType := range domain.DomainIdentity.Services {

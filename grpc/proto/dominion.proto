@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package grpc;
 
-option go_package = "github.com/jmbarzee/dominion";
+option go_package = "github.com/jmbarzee/dominion/grpc";
 import "identity.proto";
 
 service Dominion {
