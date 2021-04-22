@@ -1,6 +1,8 @@
 syntax = "proto3";
 
-package grpcd;
+option go_package = "github.com/jmbarzee/dominion";
+package grpc;
+
 
 // DominionIdentity represents a dominion
 message DominionIdentity {

@@ -74,3 +74,9 @@ Services I use -> [ExMachina](github.com/jmbarzee/exmachina)
 1. Expose Logfiles - Dominion & Domain offer routes with logfiles
 2. Connection encryption - encrypt RPCs
 3. Identity verification - sign communication with preestablished keypairs
+
+
+## Development Tools
+[gRPC & protoc](https://grpc.io/docs/languages/go/quickstart/) are used by `go generate` to update [bitbox/grpc](grpc/).
+
+[gRPCox](https://github.com/gusaul/grpcox) is a lightweight docker container for easy manual testing.

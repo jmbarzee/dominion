@@ -1,7 +1,8 @@
 syntax = "proto3";
 
-package grpcd;
+package grpc;
 
+option go_package = "github.com/jmbarzee/dominion";
 import "identity.proto";
 
 service Domain {
@@ -23,6 +24,8 @@ message StartServiceRequest {
 message StartServiceReply {
 	// Service is the newly started service
 	ServiceIdentity Service = 1;
+	// DockerImage is the image to use for the service
+	ServiceIdentity DockerImage = 2;
 }
 
 
