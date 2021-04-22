@@ -35,14 +35,14 @@ var dominionConfig *DominionConfig
 // GetDominionConfig returns the singleton DominionConfig
 func GetDominionConfig() DominionConfig {
 	if dominionConfig == nil {
-		system.Panic(errors.New("config.Setup has not ben called"))
+		system.Panic(errors.New("dominionConfig has not been intialized"))
 	}
 	return *dominionConfig
 }
 
 func setupDominionConfigFromTOML(configFilePath string) error {
 	if dominionConfig != nil {
-		return errors.New("config.setupDominionConfigFromTOML has already been called")
+		return errors.New("dominionConfig has already been intialized")
 	}
 
 	configFile, err := os.OpenFile(configFilePath, os.O_RDONLY, 0666)
@@ -69,17 +69,17 @@ func setupDominionConfigFromTOML(configFilePath string) error {
 
 func (c DominionConfig) check() error {
 	if c.Port == 0 {
-		return fmt.Errorf("Port was not set")
+		return fmt.Errorf("configuration variable 'Port' was not set")
 	}
 
 	if c.DialTimeout == 0 {
-		return fmt.Errorf("ConnectionConfig.DialTimeout was not set")
+		return fmt.Errorf("configuration variable 'ConnectionConfig.DialTimeout' was not set")
 	}
 	if c.DomainCheck == 0 {
-		return fmt.Errorf("ConnectionConfig.HeartbeatCheckv was not set")
+		return fmt.Errorf("configuration variable 'ConnectionConfig.HeartbeatCheck' was not set")
 	}
 	if c.ServiceCheck == 0 {
-		return fmt.Errorf("ServiceHierarchyConfig.DependencyCheck was not set")
+		return fmt.Errorf("configuration variable 'ServiceHierarchyConfig.DependencyCheck' was not set")
 	}
 	return nil
 }

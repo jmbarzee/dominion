@@ -37,7 +37,7 @@ var domainConfig *DomainConfig
 // GetDominionConfig returns the singleton DominionConfig
 func GetDomainConfig() DomainConfig {
 	if domainConfig == nil {
-		system.Panic(errors.New("config.Setup has not ben called"))
+		system.Panic(errors.New("domainConfig has not been intialized"))
 	}
 	return *domainConfig
 }
@@ -45,7 +45,7 @@ func GetDomainConfig() DomainConfig {
 // SetupFromTOML produces a default configuration
 func SetupFromTOML(configFilePath string) error {
 	if domainConfig != nil {
-		return errors.New("config.setupFromTOML has already been called")
+		return errors.New("domainConfig has already been intialized")
 	}
 
 	configFile, err := os.OpenFile(configFilePath, os.O_RDONLY, 0666)
@@ -73,23 +73,23 @@ func SetupFromTOML(configFilePath string) error {
 func (c DomainConfig) check() error {
 
 	if c.UUID == "" {
-		return fmt.Errorf("UUID was not set")
+		return fmt.Errorf("configuration variable 'ID' was not set")
 	}
 	if len(c.Traits) == 0 {
-		return fmt.Errorf("Traits were not set")
+		return fmt.Errorf("configuration variable 'Traits' were not set")
 	}
 	if c.Port == 0 {
-		return fmt.Errorf("Port was not set")
+		return fmt.Errorf("configuration variable 'Port' was not set")
 	}
 
 	if c.DialTimeout == 0 {
-		return fmt.Errorf("DialTimeout was not set")
+		return fmt.Errorf("configuration variable 'DialTimeout' was not set")
 	}
 	if c.IsolationCheck == 0 {
-		return fmt.Errorf("IsolationCheck was not set")
+		return fmt.Errorf("configuration variable 'IsolationCheck' was not set")
 	}
 	if c.ServiceCheck == 0 {
-		return fmt.Errorf("ServiceCheck was not set")
+		return fmt.Errorf("configuration variable 'ServiceCheck' was not set")
 	}
 
 	return nil

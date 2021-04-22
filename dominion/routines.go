@@ -23,15 +23,13 @@ func (d *Dominion) listenForBroadcasts(ctx context.Context) {
 
 	resolver, err := zeroconf.NewResolver(nil)
 	if err != nil {
-		system.LogRoutinef(routineName, "Failed to initialize resolver: %v", err.Error())
-		system.Panic(err)
+		system.Panic(fmt.Errorf("Failed to initialize resolver: %w", err))
 	}
 
 	entries := make(chan *zeroconf.ServiceEntry)
 	err = resolver.Browse(ctx, "dominion", "local.", entries)
 	if err != nil {
-		system.LogRoutinef(routineName, "Failed to browse: %v", err.Error())
-		system.Panic(err)
+		system.Panic(fmt.Errorf("Failed to browse: %w", err))
 	}
 
 	system.LogRoutinef(routineName, "Listening for broadcasts...")

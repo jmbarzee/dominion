@@ -68,7 +68,7 @@ func NewDomainIdentity(pbdIdent *pb.DomainIdentity) DomainIdentity {
 
 	version, err := semver.Parse(pbdIdent.GetVersion())
 	if err != nil {
-		system.Panic(fmt.Errorf("Error parseing version from \"%v\" - %v", pbdIdent.GetVersion(), err.Error()))
+		system.Panic(fmt.Errorf("error parseing version from \"%v\": %w", pbdIdent.GetVersion(), err))
 	}
 
 	return DomainIdentity{

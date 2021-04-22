@@ -29,14 +29,14 @@ var servicesConfig *ServicesConfig
 
 func GetServicesConfig() ServicesConfig {
 	if servicesConfig == nil {
-		system.Panic(errors.New("config.Setup has not ben called"))
+		system.Panic(errors.New("servicesConfig has not been intialized"))
 	}
 	return *servicesConfig
 }
 
 func setupServicesConfigFromTOML(configFilePath string) error {
 	if servicesConfig != nil {
-		return errors.New("config.setupServicesConfigFromTOML has already been called")
+		return errors.New("servicesConfig has already been intialized")
 	}
 
 	configFile, err := os.OpenFile(configFilePath, os.O_RDONLY, 0666)
