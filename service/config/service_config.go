@@ -12,7 +12,6 @@ type ServiceConfig struct {
 	DominionIP   net.IP
 	DominionPort int
 	DomainUUID   string
-	ServicePort  int
 	ServiceType  string
 }
 
@@ -21,30 +20,22 @@ const DefaultServiceDialTimeout = time.Millisecond * 100
 
 // FromEnv builds a ServiceConfig from the environment and arguments
 func FromEnv(serviceType string) (config ServiceConfig, err error) {
-	dominionIPString := os.Args[1]
+	dominionIPString := os.Getenv("DOMINION_IP")
 	dominionIP := net.ParseIP(dominionIPString)
 
-	dominionPortString := os.Args[2]
+	dominionPortString :=  os.Getenv("DOMINION_PORT")
 	dominionPort64, err := strconv.ParseInt(dominionPortString, 0, 32)
 	if err != nil {
 		return ServiceConfig{}, err
 	}
 	dominionPort := int(dominionPort64)
 
-	domainUUID := os.Args[3]
-
-	servicePortString := os.Args[4]
-	servicePort64, err := strconv.ParseInt(servicePortString, 0, 32)
-	if err != nil {
-		return ServiceConfig{}, err
-	}
-	servicePort := int(servicePort64)
+	domainUUID :=  os.Getenv("DOMAIN_UUID")
 
 	return ServiceConfig{
 		DominionIP:   dominionIP,
 		DominionPort: dominionPort,
 		DomainUUID:   domainUUID,
-		ServicePort:  servicePort,
 		ServiceType:  serviceType,
 	}, nil
 }
