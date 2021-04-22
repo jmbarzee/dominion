@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/blang/semver"
+	"github.com/google/uuid"
 	"github.com/jmbarzee/dominion/dominion/config"
 	"github.com/jmbarzee/dominion/dominion/domain"
 	grpc "github.com/jmbarzee/dominion/grpc"
@@ -21,6 +22,8 @@ type Dominion struct {
 	// UnimplementedDominionServer is embedded to enable forwards compatability
 	grpc.UnimplementedDominionServer
 
+	id uuid.UUID
+
 	// domains is a map of domains the dominion currently contains
 	domains domain.DomainMap
 
@@ -30,7 +33,7 @@ type Dominion struct {
 // NewDominion creates a new dominion, to correctly build the dominion, just initilize
 func NewDominion(config config.DominionConfig) (*Dominion, error) {
 
-	if err := system.Setup("dominion", "dominion"); err != nil {
+	if err := system.Setup(config.ID, "dominion"); err != nil {
 		return nil, err
 	}
 
@@ -40,6 +43,7 @@ func NewDominion(config config.DominionConfig) (*Dominion, error) {
 	}
 
 	return &Dominion{
+		id:               config.ID,
 		domains:          domain.NewDomainMap(),
 		DominionIdentity: ident,
 	}, nil
@@ -87,7 +91,7 @@ func (d Dominion) Run(ctx context.Context) error {
 func (d *Dominion) packageDomains() []identity.DomainIdentity {
 	domainIdents := make([]identity.DomainIdentity, 0)
 
-	d.domains.Range(func(uuid string, domainGuard *domain.DomainGuard) bool {
+	d.domains.Range(func(id uuid.UUID, domainGuard *domain.DomainGuard) bool {
 		domainGuard.LatchRead(func(domain domain.Domain) error {
 			domainIdents = append(domainIdents, domain.DomainIdentity)
 			return nil
@@ -101,7 +105,7 @@ func (d *Dominion) packageDomains() []identity.DomainIdentity {
 func (d *Dominion) findService(serviceTypeRequested string) []identity.ServiceIdentity {
 	serviceIdents := make([]identity.ServiceIdentity, 0)
 
-	d.domains.Range(func(uuid string, domainGuard *domain.DomainGuard) bool {
+	d.domains.Range(func(id uuid.UUID, domainGuard *domain.DomainGuard) bool {
 		domainGuard.LatchRead(func(domain domain.Domain) error {
 			serviceIdent, ok := domain.Services[serviceTypeRequested]
 			if ok {
@@ -119,7 +123,7 @@ func (d *Dominion) findServiceCanidates(serviceTypeRequested string) []identity.
 	traitsNeeded := config.GetServicesConfig().Services[serviceTypeRequested].Traits
 	domainIdents := make([]identity.DomainIdentity, 0)
 
-	d.domains.Range(func(uuid string, domainGuard *domain.DomainGuard) bool {
+	d.domains.Range(func(id uuid.UUID, domainGuard *domain.DomainGuard) bool {
 		domainGuard.LatchRead(func(domain domain.Domain) error {
 			if domain.HasTraits(traitsNeeded) {
 				domainIdents = append(domainIdents, domain.DomainIdentity)

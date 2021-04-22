@@ -34,7 +34,7 @@ type (
 // NewDomain creates a new Domain, to correctly build the Domain, just initilize
 func NewDomain(config config.DomainConfig) (*Domain, error) {
 
-	if err := system.Setup(config.UUID, "domain"); err != nil {
+	if err := system.Setup(config.ID, "domain"); err != nil {
 		return nil, err
 	}
 
@@ -64,7 +64,7 @@ func NewDomainIdentity(domainConfig config.DomainConfig) (identity.DomainIdentit
 	}
 
 	return identity.DomainIdentity{
-		UUID:    domainConfig.UUID,
+		ID:      domainConfig.ID,
 		Version: version,
 		Traits:  domainConfig.Traits,
 		Address: identity.Address{

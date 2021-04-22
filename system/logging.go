@@ -7,6 +7,8 @@ import (
 	"os"
 	"os/signal"
 	"path"
+
+	"github.com/google/uuid"
 )
 
 const (
@@ -27,21 +29,21 @@ var logger *log.Logger
 var closeFile func() error
 
 // Setup initializes logging and signal handling
-func Setup(uuid, fileName string) error {
+func Setup(id uuid.UUID, fileName string) error {
 	if logger != nil {
 		return errors.New("system.Setup has already been called")
 	}
 
-	pathUUIDLogs := path.Join(PathLogs, uuid)
-	err := os.MkdirAll(pathUUIDLogs, 0755)
+	pathIDLogs := path.Join(PathLogs, id.String())
+	err := os.MkdirAll(pathIDLogs, 0755)
 	if err != nil {
-		return fmt.Errorf("Failed to check ensure log directory \"%v\" exists: %w", pathUUIDLogs, err)
+		return fmt.Errorf("failed to check ensure log directory \"%v\" exists: %w", pathIDLogs, err)
 	}
 
-	pathUUIDLogFile := path.Join(pathUUIDLogs, fileName+".log")
-	logFile, err := os.OpenFile(pathUUIDLogFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	pathIDLogFile := path.Join(pathIDLogs, fileName+".log")
+	logFile, err := os.OpenFile(pathIDLogFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
-		return fmt.Errorf("Failed to check open log file \"%v\" exists: %w", pathUUIDLogFile, err)
+		return fmt.Errorf("failed to check open log file \"%v\" exists: %w", pathIDLogFile, err)
 	}
 	closeFile := logFile.Close
 	logger = log.New(logFile, "", log.LstdFlags)

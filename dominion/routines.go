@@ -6,6 +6,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/grandcat/zeroconf"
 	"github.com/jmbarzee/dominion/dominion/config"
 	"github.com/jmbarzee/dominion/dominion/domain"
@@ -46,22 +47,26 @@ Loop:
 				break
 			}
 
-			uuid := entry.Instance
+			id, err := uuid.Parse(entry.Instance)
+			if err != nil {
+				system.LogRoutinef(routineName, "Failed to parse uuid: %v", err.Error())
+				break
+			}
 			ip := entry.AddrIPv4[0]
 			port := entry.Port
-			system.LogRoutinef(routineName, "Found broadcast - uuid:%v ip:%v port:%v", uuid, ip, port)
+			system.LogRoutinef(routineName, "Found broadcast - uuid:%v ip:%v port:%v", id, ip, port)
 
 			newDomainGuard := domain.NewDomainGuard(identity.DomainIdentity{
 				Address: identity.Address{
 					IP:   ip,
 					Port: port,
 				},
-				UUID:     uuid,
+				ID:       id,
 				Services: make(map[string]identity.ServiceIdentity),
 			})
 
 			// Add the new member
-			d.domains.Store(uuid, newDomainGuard)
+			d.domains.Store(id, newDomainGuard)
 
 		case <-ctx.Done():
 			break Loop
@@ -72,7 +77,7 @@ Loop:
 }
 
 func (d *Dominion) checkDomains(ctx context.Context, _ time.Time) {
-	d.domains.Range(func(uuid string, domainGuard *domain.DomainGuard) bool {
+	d.domains.Range(func(id uuid.UUID, domainGuard *domain.DomainGuard) bool {
 		domainGuard.LatchRead(func(domain domain.Domain) error {
 			if time.Since(domain.LastContact) > config.GetDominionConfig().DomainCheck*10 {
 				// its been a while, make sure they are still alive
@@ -87,7 +92,7 @@ func (d *Dominion) checkDomains(ctx context.Context, _ time.Time) {
 func (d *Dominion) checkServices(ctx context.Context, _ time.Time) {
 	dependencies := make(map[string]int)
 
-	d.domains.Range(func(uuid string, domainGuard *domain.DomainGuard) bool {
+	d.domains.Range(func(id uuid.UUID, domainGuard *domain.DomainGuard) bool {
 		domainGuard.LatchRead(func(domain domain.Domain) error {
 
 			// find service dependencies
@@ -113,7 +118,7 @@ func (d *Dominion) checkServices(ctx context.Context, _ time.Time) {
 
 			// TODO Handle multiples
 			canidate := canidates[0]
-			domainGuard, ok := d.domains.Load(canidate.UUID)
+			domainGuard, ok := d.domains.Load(canidate.ID)
 			if !ok {
 				system.Errorf("Viable canidate no longer available for %v", dependency)
 				continue

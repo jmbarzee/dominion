@@ -101,10 +101,10 @@ func (d *Domain) startService(serviceType, dockerImage string) (identity.Service
 	uint16Max := (1 << 16) - 1
 	dominionIP := dominionAddr.IP
 	dominionPort := dominionAddr.Port
-	domainUUID := d.UUID
+	domainID := d.ID
 	servicePort := (rand.Intn(uint16Max) + d.Address.Port) % uint16Max
 
-	err := service.Start(serviceType, dockerImage, dominionIP, dominionPort, domainUUID, servicePort)
+	err := service.Start(serviceType, dockerImage, dominionIP, dominionPort, domainID, servicePort)
 	if err != nil {
 		return identity.ServiceIdentity{}, err
 	}

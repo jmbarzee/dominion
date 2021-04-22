@@ -5,6 +5,7 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"github.com/google/uuid"
 	"github.com/jmbarzee/dominion/system"
 )
 
@@ -21,13 +22,13 @@ func NewDomainMap() DomainMap {
 }
 
 // Delete removes a Domain from the DomainMap
-func (m DomainMap) Delete(uuid string) {
-	m.sMap.Delete(uuid)
+func (m DomainMap) Delete(id uuid.UUID) {
+	m.sMap.Delete(id)
 }
 
 // Load offers access to a Domain
-func (m DomainMap) Load(uuid string) (*DomainGuard, bool) {
-	v, ok := m.sMap.Load(uuid)
+func (m DomainMap) Load(id uuid.UUID) (*DomainGuard, bool) {
+	v, ok := m.sMap.Load(id)
 	if v == nil {
 		return nil, ok
 	}
@@ -35,8 +36,8 @@ func (m DomainMap) Load(uuid string) (*DomainGuard, bool) {
 }
 
 // LoadOrStore offers access to a Domain or stores a new one
-func (m DomainMap) LoadOrStore(uuid string, mem *DomainGuard) (*Domain, bool) {
-	v, loaded := m.sMap.LoadOrStore(uuid, mem)
+func (m DomainMap) LoadOrStore(id uuid.UUID, mem *DomainGuard) (*Domain, bool) {
+	v, loaded := m.sMap.LoadOrStore(id, mem)
 	if !loaded {
 		return nil, loaded
 	}
@@ -44,11 +45,11 @@ func (m DomainMap) LoadOrStore(uuid string, mem *DomainGuard) (*Domain, bool) {
 }
 
 // Range iterates across all Domain in the DomainMap
-func (m DomainMap) Range(f func(uuid string, mem *DomainGuard) bool) {
+func (m DomainMap) Range(f func(id uuid.UUID, mem *DomainGuard) bool) {
 	m.sMap.Range(func(k, v interface{}) bool {
-		uuid := k.(string)
+		id := k.(uuid.UUID)
 		mem := v.(*DomainGuard)
-		return f(uuid, mem)
+		return f(id, mem)
 	})
 }
 
@@ -64,9 +65,9 @@ func (m *DomainMap) SizeEstimate() int {
 }
 
 // Store stores a new Domain in the DomainMap
-func (m *DomainMap) Store(uuid string, mem *DomainGuard) {
+func (m *DomainMap) Store(id uuid.UUID, mem *DomainGuard) {
 	if mem == nil {
 		system.Panic(fmt.Errorf("Store() mem was nil"))
 	}
-	m.sMap.Store(uuid, mem)
+	m.sMap.Store(id, mem)
 }

@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 
+	"github.com/google/uuid"
 	pb "github.com/jmbarzee/dominion/grpc"
 	"github.com/jmbarzee/dominion/identity"
 	"github.com/jmbarzee/dominion/service/config"
@@ -20,7 +21,7 @@ type (
 		// UnimplementedServiceServer is embedded to enable forwards compatability
 		pb.UnimplementedServiceServer
 
-		UUID string
+		DomainID uuid.UUID
 
 		identity.ServiceIdentity
 
@@ -32,7 +33,7 @@ type (
 
 // NewService builds a service from a ServiceConfig
 func NewService(config config.ServiceConfig) (*Service, error) {
-	if err := system.Setup(config.DomainUUID, config.ServiceType); err != nil {
+	if err := system.Setup(config.DomainID, config.ServiceType); err != nil {
 		return nil, err
 	}
 	// Initialize IP
@@ -44,7 +45,7 @@ func NewService(config config.ServiceConfig) (*Service, error) {
 	server := grpc.NewServer()
 
 	service := &Service{
-		UUID: config.DomainUUID,
+		DomainID: config.DomainID,
 		ServiceIdentity: identity.ServiceIdentity{
 			Type: config.ServiceType,
 			Address: identity.Address{

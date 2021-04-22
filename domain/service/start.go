@@ -6,11 +6,12 @@ import (
 	"os/exec"
 	"strconv"
 
+	"github.com/google/uuid"
 	"github.com/jmbarzee/dominion/system"
 )
 
 // Start calls make from the services directory to start a new service
-func Start(serviceType string, dockerImage string, ip net.IP, dominionPort int, domainUUID string, servicePort int) error {
+func Start(serviceType string, dockerImage string, ip net.IP, dominionPort int, domainID uuid.UUID, servicePort int) error {
 	system.Logf("Starting %v!", serviceType)
 	system.Logf("Using image: %v", dockerImage)
 
@@ -30,7 +31,7 @@ func Start(serviceType string, dockerImage string, ip net.IP, dominionPort int, 
 	cmd.Env = []string{
 		"DOMINION_IP=" + ip.String(),
 		"DOMINION_PORT=" + strconv.Itoa(dominionPort),
-		"DOMAIN_UUID=" + domainUUID,
+		"DOMAIN_ID=" + domainID.String(),
 		"SERVICE_PORT=" + servicePortString,
 	}
 

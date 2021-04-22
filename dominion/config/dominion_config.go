@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
+	"github.com/google/uuid"
 	"github.com/jmbarzee/dominion/system"
 )
 
@@ -17,6 +18,9 @@ type (
 	DominionConfig struct {
 		// Port is the port which the domain will be responding on
 		Port int
+
+		// ID is the unique ID of the Dominion
+		ID uuid.UUID
 
 		// DialTimeout is how long a domain will wait for a grpc.ClientConn to establish
 		DialTimeout time.Duration
@@ -63,6 +67,8 @@ func setupDominionConfigFromTOML(configFilePath string) error {
 		return err
 	}
 
+	config.ID = uuid.New()
+
 	dominionConfig = config
 	return nil
 }
@@ -70,6 +76,10 @@ func setupDominionConfigFromTOML(configFilePath string) error {
 func (c DominionConfig) check() error {
 	if c.Port == 0 {
 		return fmt.Errorf("configuration variable 'Port' was not set")
+	}
+
+	if c.ID == uuid.Nil {
+		return fmt.Errorf("configuration variable 'ID' was not set")
 	}
 
 	if c.DialTimeout == 0 {
@@ -86,6 +96,7 @@ func (c DominionConfig) check() error {
 
 func (c DominionConfig) String() string {
 	dumpMsg := "\tPort: " + strconv.Itoa(c.Port) + "\n" +
+		"\tID: " + c.ID.String() + "\n" +
 		"\tDialTimeout: " + c.DialTimeout.String() + "\n" +
 		"\tDomainCheck: " + c.DomainCheck.String() + "\n" +
 		"\tServiceCheck: " + c.ServiceCheck.String() + "\n" +

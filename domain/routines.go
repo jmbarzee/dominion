@@ -62,7 +62,7 @@ func (d *Domain) broadcastSelf(ctx context.Context) {
 	system.LogRoutinef(routineName, "Starting routine")
 
 	// setup broadcasting
-	server, err := zeroconf.Register(string(d.UUID), "dominion", "local.", d.Address.Port, []string{"txtv=0", "lo=1", "la=2"}, nil)
+	server, err := zeroconf.Register(d.ID.String(), "dominion", "local.", d.Address.Port, []string{"txtv=0", "lo=1", "la=2"}, nil)
 	if err != nil {
 		system.Panic(fmt.Errorf("Failed to broadcast: %w", err))
 	}

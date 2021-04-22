@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/blang/semver"
+	"github.com/google/uuid"
 	pb "github.com/jmbarzee/dominion/grpc"
 	"github.com/jmbarzee/dominion/system"
 )
@@ -14,8 +15,8 @@ type DomainIdentity struct {
 	Address Address
 	// Version is the version of code being run by the domain
 	Version semver.Version
-	// UUID is a unique identifier for a Domain
-	UUID string
+	// ID is a unique identifier for a Domain
+	ID uuid.UUID
 	// Traits is the list of traits of the domain
 	Traits []string
 
@@ -27,7 +28,7 @@ func (i DomainIdentity) String() string {
 	s := `{
 	Address: ` + i.Address.String() + `
 	Version: ` + i.Version.String() + `
-	UUID: ` + i.UUID + `
+	ID: ` + i.ID.String() + `
 	Traits: [`
 	for _, trait := range i.Traits {
 		s += trait + ","
@@ -71,10 +72,15 @@ func NewDomainIdentity(pbdIdent *pb.DomainIdentity) DomainIdentity {
 		system.Panic(fmt.Errorf("error parseing version from \"%v\": %w", pbdIdent.GetVersion(), err))
 	}
 
+	id, err := uuid.FromBytes(pbdIdent.GetID())
+	if err != nil {
+		system.Panic(fmt.Errorf("error parseing id from \"%b\": %w", pbdIdent.GetID(), err))
+	}
+
 	return DomainIdentity{
 		Address:  NewAddress(pbdIdent.GetAddress()),
 		Version:  version,
-		UUID:     pbdIdent.GetUUID(),
+		ID:       id,
 		Traits:   pbdIdent.GetTraits(),
 		Services: NewServiceIdentityMap(pbdIdent.GetServices()),
 	}
@@ -84,7 +90,7 @@ func NewDomainIdentity(pbdIdent *pb.DomainIdentity) DomainIdentity {
 func NewPBDomainIdentity(dIdent DomainIdentity) *pb.DomainIdentity {
 	return &pb.DomainIdentity{
 		Address:  NewPBAddress(dIdent.Address),
-		UUID:     dIdent.UUID,
+		ID:       dIdent.ID[:],
 		Version:  dIdent.Version.String(),
 		Traits:   dIdent.Traits,
 		Services: NewPBServiceIdentityMap(dIdent.Services),

@@ -2,18 +2,21 @@ package config
 
 import (
 	"net"
-	"os"
 	"strconv"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/jmbarzee/dominion/system"
 )
 
 // ServiceConfig contains all information needed to start a service
 type ServiceConfig struct {
 	DominionIP   net.IP
 	DominionPort int
-	DomainUUID   string
+	DomainID     uuid.UUID
 	ServiceType  string
 	ServicePort  int
+	ServiceID    uuid.UUID
 }
 
 // DefaultServiceDialTimeout is the default time out for grpc dial operations
@@ -21,30 +24,37 @@ const DefaultServiceDialTimeout = time.Millisecond * 100
 
 // FromEnv builds a ServiceConfig from the environment and arguments
 func FromEnv(serviceType string) (config ServiceConfig, err error) {
-	dominionIPString := os.Getenv("DOMINION_IP")
+	dominionIPString := system.RequireEnv("DOMINION_IP")
 	dominionIP := net.ParseIP(dominionIPString)
 
-	dominionPortString := os.Getenv("DOMINION_PORT")
+	dominionPortString := system.RequireEnv("DOMINION_PORT")
 	dominionPort64, err := strconv.ParseInt(dominionPortString, 0, 32)
 	if err != nil {
 		return ServiceConfig{}, err
 	}
 	dominionPort := int(dominionPort64)
 
-	domainUUID := os.Getenv("DOMAIN_UUID")
+	domainIDString := system.RequireEnv("DOMAIN_ID")
+	domainID, err := uuid.Parse(domainIDString)
+	if err != nil {
+		return ServiceConfig{}, err
+	}
 
-	servicePortString := os.Getenv("SERVICE_PORT")
+	servicePortString := system.RequireEnv("SERVICE_PORT")
 	servicePort64, err := strconv.ParseInt(servicePortString, 0, 32)
 	if err != nil {
 		return ServiceConfig{}, err
 	}
 	servicePort := int(servicePort64)
 
+	serviceID := uuid.New()
+
 	return ServiceConfig{
 		DominionIP:   dominionIP,
 		DominionPort: dominionPort,
-		DomainUUID:   domainUUID,
+		DomainID:     domainID,
 		ServiceType:  serviceType,
 		ServicePort:  servicePort,
+		ServiceID:    serviceID,
 	}, nil
 }

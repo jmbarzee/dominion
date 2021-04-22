@@ -70,7 +70,7 @@ Loop:
 func RequireEnv(varName string) string {
 	value := os.Getenv(varName)
 	if value == "" {
-		panic(fmt.Errorf("Could not find required environment variable %s", varName))
+		panic(fmt.Errorf("could not find required environment variable %s", varName))
 	}
 	return value
 }

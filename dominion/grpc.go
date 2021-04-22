@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/jmbarzee/dominion/dominion/domain"
 	grpc "github.com/jmbarzee/dominion/grpc"
 	"github.com/jmbarzee/dominion/identity"
@@ -37,9 +38,9 @@ func (d *Dominion) GetDomains(ctx context.Context, request *grpc.Empty) (*grpc.G
 
 func (d *Dominion) rpcHeartbeat(ctx context.Context, domainGuard *domain.DomainGuard) {
 	rpcName := "Heartbeat"
-	uuid := ""
+	id := uuid.Nil
 	err := domainGuard.LatchWrite(func(domain *domain.Domain) error {
-		uuid = domain.DomainIdentity.UUID
+		id = domain.DomainIdentity.ID
 
 		if err := connect.CheckConnection(ctx, domain); err != nil {
 			return fmt.Errorf("Failed to check connection: %w", err)
@@ -67,8 +68,8 @@ func (d *Dominion) rpcHeartbeat(ctx context.Context, domainGuard *domain.DomainG
 	})
 
 	if err != nil {
-		system.Errorf("Dropping Domain %s: %w", uuid, err)
-		d.domains.Delete(uuid)
+		system.Errorf("Dropping Domain %s: %w", id, err)
+		d.domains.Delete(id)
 	}
 }
 

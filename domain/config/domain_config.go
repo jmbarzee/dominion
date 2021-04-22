@@ -9,14 +9,15 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
+	"github.com/google/uuid"
 	"github.com/jmbarzee/dominion/system"
 )
 
 type (
 	// DomainConfig holds all the information required to start a Domain
 	DomainConfig struct {
-		// UUID is a unique identifier for a domain
-		UUID string
+		// ID is a unique identifier for a domain
+		ID uuid.UUID
 		// Port is the port which the domain will be responding on
 		Port int
 
@@ -66,13 +67,15 @@ func SetupFromTOML(configFilePath string) error {
 		return err
 	}
 
+	config.ID = uuid.New()
+
 	domainConfig = config
 	return nil
 }
 
 func (c DomainConfig) check() error {
 
-	if c.UUID == "" {
+	if c.ID == uuid.Nil {
 		return fmt.Errorf("configuration variable 'ID' was not set")
 	}
 	if len(c.Traits) == 0 {
@@ -97,7 +100,7 @@ func (c DomainConfig) check() error {
 
 func (c DomainConfig) String() string {
 
-	dumpMsg := "\tUUID: " + c.UUID + "\n"
+	dumpMsg := "\tID: " + c.ID.String() + "\n"
 
 	dumpMsg += "\tTraits: ["
 	for _, trait := range c.Traits {

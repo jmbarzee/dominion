@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/blang/semver v3.5.1+incompatible
+	github.com/google/uuid v1.2.0
 	github.com/grandcat/zeroconf v1.0.0
 	golang.org/x/net v0.0.0-20210421230115-4e50805a0758 // indirect
 	golang.org/x/sys v0.0.0-20210421221651-33663a62ff08 // indirect
