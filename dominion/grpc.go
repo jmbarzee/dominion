@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jmbarzee/dominion/dominion/domain"
 	grpc "github.com/jmbarzee/dominion/grpc"
-	"github.com/jmbarzee/dominion/identity"
+	"github.com/jmbarzee/dominion/ident"
 	"github.com/jmbarzee/dominion/system"
 	"github.com/jmbarzee/dominion/system/connect"
 )
@@ -19,7 +19,7 @@ func (d *Dominion) GetServices(ctx context.Context, request *grpc.GetServicesReq
 	rpcName := "GetServices"
 	system.LogRPCf(rpcName, "Receiving request")
 	reply := &grpc.GetServicesReply{
-		Services: identity.NewPBServiceIdentityList(d.findService(request.Type)),
+		Services: ident.NewGRPCServiceIdentityList(d.findService(request.Type)),
 	}
 	system.LogRPCf(rpcName, "Sending reply")
 	return reply, nil
@@ -30,7 +30,7 @@ func (d *Dominion) GetDomains(ctx context.Context, request *grpc.Empty) (*grpc.G
 	rpcName := "GetAllServices"
 	system.LogRPCf(rpcName, "Receiving request")
 	reply := &grpc.GetDomainsReply{
-		Domains: identity.NewPBDomainIdentityList(d.packageDomains()),
+		Domains: ident.NewGRPCDomainIdentityList(d.packageDomains()),
 	}
 	system.LogRPCf(rpcName, "Sending reply")
 	return reply, nil
@@ -48,7 +48,7 @@ func (d *Dominion) rpcHeartbeat(ctx context.Context, domainGuard *domain.DomainG
 
 		// Prepare request
 		request := &grpc.HeartbeatRequest{
-			Dominion: identity.NewPBDominionIdentity(d.DominionIdentity),
+			Dominion: ident.NewGRPCDominionIdentity(d.DominionIdentity),
 		}
 
 		// Send RPC
@@ -62,8 +62,11 @@ func (d *Dominion) rpcHeartbeat(ctx context.Context, domainGuard *domain.DomainG
 
 		// Update domain
 		domain.LastContact = time.Now()
-		fmt.Println(identity.NewDomainIdentity(reply.GetDomain()))
-		domain.DomainIdentity = identity.NewDomainIdentity(reply.GetDomain())
+		domainIdent, err := ident.NewDomainIdentity(reply.GetDomain())
+		if err != nil {
+			return err
+		}
+		domain.DomainIdentity = domainIdent
 		return nil
 	})
 
@@ -97,7 +100,12 @@ func (d *Dominion) rpcStartService(ctx context.Context, domainGuard *domain.Doma
 
 		// Update domain
 		domain.LastContact = time.Now()
-		domain.DomainIdentity.Services[serviceType] = identity.NewServiceIdentity(reply.GetService())
+		serviceIdent, err := ident.NewServiceIdentity(reply.GetService())
+		if err != nil {
+			return err
+		}
+
+		domain.AddService(serviceIdent)
 		return nil
 
 	})

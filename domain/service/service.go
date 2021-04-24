@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/jmbarzee/dominion/domain/config"
-	"github.com/jmbarzee/dominion/identity"
+	"github.com/jmbarzee/dominion/ident"
 	"google.golang.org/grpc"
 )
 
@@ -12,7 +12,7 @@ import (
 // Service implements system.Connectable
 type Service struct {
 	//ServiceIdentity holds the identifying information of the service
-	identity.ServiceIdentity
+	ident.ServiceIdentity
 
 	// conn is the protocol buffer connection to the member
 	Conn *grpc.ClientConn
@@ -22,8 +22,8 @@ type Service struct {
 }
 
 // GetAddress returns the target address for the connection
-func (s Service) GetAddress() identity.Address {
-	return s.Address
+func (s Service) GetAddress() ident.Address {
+	return s.Identity.Address
 }
 
 // GetConnection returns a current gRCP connection (for checking)

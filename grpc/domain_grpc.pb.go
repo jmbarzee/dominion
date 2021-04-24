@@ -18,10 +18,10 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DomainClient interface {
-	// StartService requests a domain start a service
-	StartService(ctx context.Context, in *StartServiceRequest, opts ...grpc.CallOption) (*StartServiceReply, error)
 	// Heartbeat verifies the status/identity of the domain
 	Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*HeartbeatReply, error)
+	// StartService requests a domain start a service
+	StartService(ctx context.Context, in *StartServiceRequest, opts ...grpc.CallOption) (*StartServiceReply, error)
 }
 
 type domainClient struct {
@@ -30,15 +30,6 @@ type domainClient struct {
 
 func NewDomainClient(cc grpc.ClientConnInterface) DomainClient {
 	return &domainClient{cc}
-}
-
-func (c *domainClient) StartService(ctx context.Context, in *StartServiceRequest, opts ...grpc.CallOption) (*StartServiceReply, error) {
-	out := new(StartServiceReply)
-	err := c.cc.Invoke(ctx, "/grpc.Domain/StartService", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *domainClient) Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*HeartbeatReply, error) {
@@ -50,14 +41,23 @@ func (c *domainClient) Heartbeat(ctx context.Context, in *HeartbeatRequest, opts
 	return out, nil
 }
 
+func (c *domainClient) StartService(ctx context.Context, in *StartServiceRequest, opts ...grpc.CallOption) (*StartServiceReply, error) {
+	out := new(StartServiceReply)
+	err := c.cc.Invoke(ctx, "/grpc.Domain/StartService", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DomainServer is the server API for Domain service.
 // All implementations must embed UnimplementedDomainServer
 // for forward compatibility
 type DomainServer interface {
-	// StartService requests a domain start a service
-	StartService(context.Context, *StartServiceRequest) (*StartServiceReply, error)
 	// Heartbeat verifies the status/identity of the domain
 	Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatReply, error)
+	// StartService requests a domain start a service
+	StartService(context.Context, *StartServiceRequest) (*StartServiceReply, error)
 	mustEmbedUnimplementedDomainServer()
 }
 
@@ -65,11 +65,11 @@ type DomainServer interface {
 type UnimplementedDomainServer struct {
 }
 
-func (UnimplementedDomainServer) StartService(context.Context, *StartServiceRequest) (*StartServiceReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method StartService not implemented")
-}
 func (UnimplementedDomainServer) Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Heartbeat not implemented")
+}
+func (UnimplementedDomainServer) StartService(context.Context, *StartServiceRequest) (*StartServiceReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StartService not implemented")
 }
 func (UnimplementedDomainServer) mustEmbedUnimplementedDomainServer() {}
 
@@ -82,24 +82,6 @@ type UnsafeDomainServer interface {
 
 func RegisterDomainServer(s grpc.ServiceRegistrar, srv DomainServer) {
 	s.RegisterService(&Domain_ServiceDesc, srv)
-}
-
-func _Domain_StartService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StartServiceRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DomainServer).StartService(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/grpc.Domain/StartService",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DomainServer).StartService(ctx, req.(*StartServiceRequest))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _Domain_Heartbeat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -120,6 +102,24 @@ func _Domain_Heartbeat_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Domain_StartService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StartServiceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DomainServer).StartService(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpc.Domain/StartService",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DomainServer).StartService(ctx, req.(*StartServiceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Domain_ServiceDesc is the grpc.ServiceDesc for Domain service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -128,12 +128,12 @@ var Domain_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*DomainServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "StartService",
-			Handler:    _Domain_StartService_Handler,
-		},
-		{
 			MethodName: "Heartbeat",
 			Handler:    _Domain_Heartbeat_Handler,
+		},
+		{
+			MethodName: "StartService",
+			Handler:    _Domain_StartService_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -31,10 +31,10 @@ func (d *Domain) checkServices(ctx context.Context, _ time.Time) {
 
 func (d *Domain) checkIsolation(ctx context.Context, _ time.Time) {
 	var shouldBeBroadcasting bool
-	if d.Dominion == nil {
+	if d.dominion == nil {
 		shouldBeBroadcasting = true
 	} else {
-		d.Dominion.LatchRead(func(dominion *dominion.Dominion) error {
+		d.dominion.LatchRead(func(dominion *dominion.Dominion) error {
 			if time.Since(dominion.LastContact) < config.GetDomainConfig().IsolationCheck*10 {
 				// Dominion hasn't expired
 				if d.stopBroadcastSelf != nil {

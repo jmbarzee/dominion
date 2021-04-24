@@ -1,18 +1,18 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
-	"net"
 	"os/exec"
 	"strconv"
 
-	"github.com/google/uuid"
+	"github.com/jmbarzee/dominion/ident"
 	"github.com/jmbarzee/dominion/system"
 )
 
 // Start calls make from the services directory to start a new service
-func Start(serviceType string, dockerImage string, ip net.IP, dominionPort int, domainID uuid.UUID, servicePort int) error {
-	system.Logf("Starting %v!", serviceType)
+func Start(serviceIdent ident.ServiceIdentity, domainIdent ident.DomainIdentity, dominionIdent ident.DominionIdentity, dockerImage string) error {
+	system.Logf("Starting %v!", serviceIdent.Type)
 	system.Logf("Using image: %v", dockerImage)
 
 	dockerPath, err := exec.LookPath("docker")
@@ -20,19 +20,33 @@ func Start(serviceType string, dockerImage string, ip net.IP, dominionPort int, 
 		return fmt.Errorf("docker was not found in path: %w", err)
 	}
 
-	servicePortString := strconv.Itoa(servicePort)
+	serviceIdentBytes, err := json.Marshal(serviceIdent)
+	if err == nil {
+		return fmt.Errorf("couldn't marshal serviceIdent: %w", err)
+	}
+
+	domainIdentBytes, err := json.Marshal(serviceIdent)
+	if err == nil {
+		return fmt.Errorf("couldn't marshal domainIdent: %w", err)
+	}
+
+	dominionIdentBytes, err := json.Marshal(serviceIdent)
+	if err == nil {
+		return fmt.Errorf("couldn't marshal dominionIdent: %w", err)
+	}
+
+	servicePort := strconv.Itoa(serviceIdent.Address.Port)
 
 	cmd := exec.Command(
 		dockerPath,
 		"run",
 		"--pull",
-		"--publish "+servicePortString+":"+servicePortString)
+		"--publish "+servicePort+":"+servicePort)
 	// pgid is same as parents by default
 	cmd.Env = []string{
-		"DOMINION_IP=" + ip.String(),
-		"DOMINION_PORT=" + strconv.Itoa(dominionPort),
-		"DOMAIN_ID=" + domainID.String(),
-		"SERVICE_PORT=" + servicePortString,
+		"SERVICE='" + string(serviceIdentBytes) + "'",
+		"DOMAIN='" + string(domainIdentBytes) + "'",
+		"DOMINION='" + string(dominionIdentBytes) + "'",
 	}
 
 	err = cmd.Start()

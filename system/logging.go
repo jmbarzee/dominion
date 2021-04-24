@@ -12,9 +12,6 @@ import (
 )
 
 const (
-	// Version is the current version of the system
-	// TODO: use for auto updating
-	Version = "0.1.0"
 
 	// PathBase is the location of all dominion src files
 	PathBase = "/usr/local/dominion"

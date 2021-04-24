@@ -3,7 +3,7 @@ package domain
 import (
 	"sync"
 
-	"github.com/jmbarzee/dominion/identity"
+	"github.com/jmbarzee/dominion/ident"
 )
 
 // DomainGuard protects a domain for concurrent access
@@ -15,7 +15,7 @@ type DomainGuard struct {
 }
 
 // NewDomainGuard returns a new DomainGuard with the passed identity
-func NewDomainGuard(identity identity.DomainIdentity) *DomainGuard {
+func NewDomainGuard(identity ident.DomainIdentity) *DomainGuard {
 	return &DomainGuard{
 		domain: Domain{
 			DomainIdentity: identity,

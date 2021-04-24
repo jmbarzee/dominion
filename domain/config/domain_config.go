@@ -3,26 +3,20 @@ package config
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"os"
 	"strconv"
 	"time"
 
 	"github.com/BurntSushi/toml"
-	"github.com/google/uuid"
+	"github.com/jmbarzee/dominion/ident"
 	"github.com/jmbarzee/dominion/system"
+	"github.com/jmbarzee/dominion/system/config"
 )
 
 type (
 	// DomainConfig holds all the information required to start a Domain
 	DomainConfig struct {
-		// ID is a unique identifier for a domain
-		ID uuid.UUID
-		// Port is the port which the domain will be responding on
-		Port int
-
-		// Traits is the traits possesed by the domain.
-		Traits []string
+		// DomainIdentity holds identifying information
+		ident.DomainIdentity
 
 		// DialTimeout is how long a domain will wait for a grpc.ClientConn to establish
 		DialTimeout time.Duration
@@ -49,40 +43,38 @@ func SetupFromTOML(configFilePath string) error {
 		return errors.New("domainConfig has already been intialized")
 	}
 
-	configFile, err := os.OpenFile(configFilePath, os.O_RDONLY, 0666)
-	if err != nil {
-		return err
-	}
-	bytes, err := ioutil.ReadAll(configFile)
+	bytes, err := config.ReadWholeConfigFile(configFilePath)
 	if err != nil {
 		return err
 	}
 
-	config := &DomainConfig{}
-	if err = toml.Unmarshal(bytes, config); err != nil {
+	c := &DomainConfig{}
+	if err = toml.Unmarshal(bytes, c); err != nil {
 		return err
 	}
 
-	if err = config.check(); err != nil {
+	c.Identity, err = config.Patch(c.Identity)
+	if err != nil {
 		return err
 	}
 
-	config.ID = uuid.New()
+	if err = c.check(); err != nil {
+		return err
+	}
 
-	domainConfig = config
+	domainConfig = c
 	return nil
 }
 
 func (c DomainConfig) check() error {
 
-	if c.ID == uuid.Nil {
-		return fmt.Errorf("configuration variable 'ID' was not set")
+	err := config.Check(c.Identity)
+	if err != nil {
+		return err
 	}
+
 	if len(c.Traits) == 0 {
 		return fmt.Errorf("configuration variable 'Traits' were not set")
-	}
-	if c.Port == 0 {
-		return fmt.Errorf("configuration variable 'Port' was not set")
 	}
 
 	if c.DialTimeout == 0 {
@@ -100,7 +92,7 @@ func (c DomainConfig) check() error {
 
 func (c DomainConfig) String() string {
 
-	dumpMsg := "\tID: " + c.ID.String() + "\n"
+	dumpMsg := "\tIdentity: " + c.Identity.String() + "\n"
 
 	dumpMsg += "\tTraits: ["
 	for _, trait := range c.Traits {
@@ -108,8 +100,7 @@ func (c DomainConfig) String() string {
 	}
 	dumpMsg += "]\n"
 
-	dumpMsg += "\tPort: " + strconv.Itoa(c.Port) + "\n" +
-		"\tDialTimeout: \n" + strconv.Itoa(int(c.DialTimeout)) +
+	dumpMsg += "\tDialTimeout: \n" + strconv.Itoa(int(c.DialTimeout)) +
 		"\tServiceCheck: \n" + strconv.Itoa(int(c.ServiceCheck)) +
 		"\tIsolationCheck: \n" + strconv.Itoa(int(c.IsolationCheck))
 	return dumpMsg

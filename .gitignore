@@ -1,10 +1,6 @@
 // all logfiles
 *.log
 
-// vscode debug config
+// vscode
 launch.json
-
-
-// all services except example
-services/*
-!services/example
+.history

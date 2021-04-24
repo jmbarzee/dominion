@@ -2,11 +2,10 @@ package config
 
 import (
 	"errors"
-	"io/ioutil"
-	"os"
 
 	"github.com/BurntSushi/toml"
 	"github.com/jmbarzee/dominion/system"
+	"github.com/jmbarzee/dominion/system/config"
 )
 
 type (
@@ -39,11 +38,7 @@ func setupServicesConfigFromTOML(configFilePath string) error {
 		return errors.New("servicesConfig has already been intialized")
 	}
 
-	configFile, err := os.OpenFile(configFilePath, os.O_RDONLY, 0666)
-	if err != nil {
-		return err
-	}
-	bytes, err := ioutil.ReadAll(configFile)
+	bytes, err := config.ReadWholeConfigFile(configFilePath)
 	if err != nil {
 		return err
 	}

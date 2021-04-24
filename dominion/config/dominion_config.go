@@ -3,24 +3,20 @@ package config
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"os"
-	"strconv"
 	"time"
 
 	"github.com/BurntSushi/toml"
-	"github.com/google/uuid"
+
+	"github.com/jmbarzee/dominion/ident"
 	"github.com/jmbarzee/dominion/system"
+	"github.com/jmbarzee/dominion/system/config"
 )
 
 type (
 	// DominionConfig holds all the information required to start a Dominion
 	DominionConfig struct {
-		// Port is the port which the domain will be responding on
-		Port int
-
-		// ID is the unique ID of the Dominion
-		ID uuid.UUID
+		// DominionIdentity holds identifying information
+		ident.DominionIdentity
 
 		// DialTimeout is how long a domain will wait for a grpc.ClientConn to establish
 		DialTimeout time.Duration
@@ -49,37 +45,34 @@ func setupDominionConfigFromTOML(configFilePath string) error {
 		return errors.New("dominionConfig has already been intialized")
 	}
 
-	configFile, err := os.OpenFile(configFilePath, os.O_RDONLY, 0666)
-	if err != nil {
-		return err
-	}
-	bytes, err := ioutil.ReadAll(configFile)
+	bytes, err := config.ReadWholeConfigFile(configFilePath)
 	if err != nil {
 		return err
 	}
 
-	config := &DominionConfig{}
-	if err = toml.Unmarshal(bytes, config); err != nil {
+	c := &DominionConfig{}
+	if err = toml.Unmarshal(bytes, c); err != nil {
 		return err
 	}
 
-	if err = config.check(); err != nil {
+	c.Identity, err = config.Patch(c.Identity)
+	if err != nil {
 		return err
 	}
 
-	config.ID = uuid.New()
+	if err = c.check(); err != nil {
+		return err
+	}
 
-	dominionConfig = config
+	dominionConfig = c
 	return nil
 }
 
 func (c DominionConfig) check() error {
-	if c.Port == 0 {
-		return fmt.Errorf("configuration variable 'Port' was not set")
-	}
 
-	if c.ID == uuid.Nil {
-		return fmt.Errorf("configuration variable 'ID' was not set")
+	err := config.Check(c.Identity)
+	if err != nil {
+		return err
 	}
 
 	if c.DialTimeout == 0 {
@@ -95,8 +88,7 @@ func (c DominionConfig) check() error {
 }
 
 func (c DominionConfig) String() string {
-	dumpMsg := "\tPort: " + strconv.Itoa(c.Port) + "\n" +
-		"\tID: " + c.ID.String() + "\n" +
+	dumpMsg := "\tIdentity: " + c.Identity.String() + "\n" +
 		"\tDialTimeout: " + c.DialTimeout.String() + "\n" +
 		"\tDomainCheck: " + c.DomainCheck.String() + "\n" +
 		"\tServiceCheck: " + c.ServiceCheck.String() + "\n" +

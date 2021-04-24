@@ -4,7 +4,7 @@ import (
 	"context"
 
 	pb "github.com/jmbarzee/dominion/grpc"
-	"github.com/jmbarzee/dominion/identity"
+	"github.com/jmbarzee/dominion/ident"
 	"github.com/jmbarzee/dominion/service/dominion"
 	"github.com/jmbarzee/dominion/system"
 	"github.com/jmbarzee/dominion/system/connect"
@@ -18,16 +18,16 @@ func (s *Service) Heartbeat(ctx context.Context, request *pb.ServiceHeartbeatReq
 
 	// Prepare reply
 	reply := &pb.ServiceHeartbeatReply{
-		Service: identity.NewPBServiceIdentity(s.ServiceIdentity),
+		Service: ident.NewGRPCServiceIdentity(s.ServiceIdentity),
 	}
 	system.LogRPCf(rpcName, "Sending reply")
 	return reply, nil
 }
 
 // RPCGetServices requests a list of services from the dominion
-func (s Service) RPCGetServices(ctx context.Context, serviceType string) ([]identity.ServiceIdentity, error) {
+func (s Service) RPCGetServices(ctx context.Context, serviceType string) ([]ident.ServiceIdentity, error) {
 	rpcName := "GetServices"
-	services := []identity.ServiceIdentity{}
+	services := []ident.ServiceIdentity{}
 
 	err := s.Dominion.LatchWrite(func(dominion *dominion.Dominion) error {
 		err := connect.CheckConnection(ctx, dominion)
@@ -47,7 +47,11 @@ func (s Service) RPCGetServices(ctx context.Context, serviceType string) ([]iden
 		}
 		system.LogRPCf(rpcName, "Received reply")
 
-		services = identity.NewServiceIdentityList(reply.GetServices())
+		serviceList, err := ident.NewServiceIdentityList(reply.GetServices())
+		if err != nil {
+			return err
+		}
+		services = serviceList
 		return nil
 	})
 	if err != nil {

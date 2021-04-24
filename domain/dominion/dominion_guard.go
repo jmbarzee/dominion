@@ -3,7 +3,7 @@ package dominion
 import (
 	"sync"
 
-	"github.com/jmbarzee/dominion/identity"
+	"github.com/jmbarzee/dominion/ident"
 )
 
 // DominionGuard protects a dominion for concurrent access
@@ -15,7 +15,7 @@ type DominionGuard struct {
 }
 
 // NewDominionGuard returns a new DominionGuard with the passed identity
-func NewDominionGuard(identity identity.DominionIdentity) *DominionGuard {
+func NewDominionGuard(identity ident.DominionIdentity) *DominionGuard {
 	return &DominionGuard{
 		dominion: Dominion{
 			DominionIdentity: identity,

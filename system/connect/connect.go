@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/jmbarzee/dominion/identity"
+	"github.com/jmbarzee/dominion/ident"
 	"github.com/jmbarzee/dominion/system"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
@@ -14,7 +14,7 @@ import (
 // Connectable is anything which holds a gRPC connection
 type Connectable interface {
 	// GetAddress returns the target address for the connection
-	GetAddress() identity.Address
+	GetAddress() ident.Address
 	// GetConnection returns a current gRCP connection (for checking)
 	GetConnection() *grpc.ClientConn
 	// SetConnection replaces the connection of the device (any existing connection will be closed prior to this)

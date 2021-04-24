@@ -3,7 +3,7 @@ package dominion
 import (
 	"time"
 
-	"github.com/jmbarzee/dominion/identity"
+	"github.com/jmbarzee/dominion/ident"
 	"github.com/jmbarzee/dominion/service/config"
 	"google.golang.org/grpc"
 )
@@ -12,15 +12,15 @@ import (
 // Dominion implements system.Connectable
 type Dominion struct {
 	//DominionIdentity holds the identifying information of the dominion
-	identity.DominionIdentity
+	ident.DominionIdentity
 
 	// conn is the protocol buffer connection to the member
 	Conn *grpc.ClientConn
 }
 
 // GetAddress returns the target address for the connection
-func (d Dominion) GetAddress() identity.Address {
-	return d.Address
+func (d Dominion) GetAddress() ident.Address {
+	return d.Identity.Address
 }
 
 // GetConnection returns a current gRCP connection (for checking)

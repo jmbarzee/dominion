@@ -10,7 +10,7 @@ import (
 	"github.com/jmbarzee/dominion/domain/dominion"
 	service "github.com/jmbarzee/dominion/domain/service"
 	grpc "github.com/jmbarzee/dominion/grpc"
-	"github.com/jmbarzee/dominion/identity"
+	"github.com/jmbarzee/dominion/ident"
 	"github.com/jmbarzee/dominion/system"
 	"github.com/jmbarzee/dominion/system/connect"
 )
@@ -20,14 +20,22 @@ import (
 func (d *Domain) Heartbeat(ctx context.Context, request *grpc.HeartbeatRequest) (*grpc.HeartbeatReply, error) {
 	rpcName := "Heartbeat"
 	system.LogRPCf(rpcName, "Receiving request")
-	if err := d.updateDominion(identity.NewDominionIdentity(request.GetDominion())); err != nil {
+
+	dominionIdent, err := ident.NewDominionIdentity(request.GetDominion())
+	if err != nil {
+		system.LogRPCf(rpcName, "Error: %s", err.Error())
 		return nil, err
 	}
 
-	fmt.Println(d.packageDomainIdentity())
+	if err := d.updateDominion(dominionIdent); err != nil {
+		system.LogRPCf(rpcName, "Error: %s", err.Error())
+		return nil, err
+	}
+
 	// Prepare reply
 	reply := &grpc.HeartbeatReply{
-		Domain: identity.NewPBDomainIdentity(d.packageDomainIdentity()),
+		Domain:   ident.NewGRPCDomainIdentity(d.DomainIdentity),
+		Services: ident.NewGRPCServiceIdentityList(d.packageServices()),
 	}
 	system.LogRPCf(rpcName, "Sending reply")
 	return reply, nil
@@ -45,7 +53,7 @@ func (d *Domain) rpcHeartbeat(ctx context.Context, serviceGuard *service.Service
 
 		// Prepare request
 		request := &grpc.ServiceHeartbeatRequest{
-			Domain: identity.NewPBDomainIdentity(d.DomainIdentity),
+			Domain: ident.NewGRPCDomainIdentity(d.DomainIdentity),
 		}
 
 		// Send RPC
@@ -59,7 +67,11 @@ func (d *Domain) rpcHeartbeat(ctx context.Context, serviceGuard *service.Service
 
 		// Update domain
 		service.LastContact = time.Now()
-		service.ServiceIdentity = identity.NewServiceIdentity(reply.GetService())
+		serviceIdent, err := ident.NewServiceIdentity(reply.GetService())
+		if err != nil {
+			return err
+		}
+		service.ServiceIdentity = serviceIdent
 		return nil
 	})
 
@@ -73,7 +85,7 @@ func (d *Domain) rpcHeartbeat(ctx context.Context, serviceGuard *service.Service
 func (d *Domain) StartService(ctx context.Context, request *grpc.StartServiceRequest) (*grpc.StartServiceReply, error) {
 	rpcName := "StartService"
 	system.LogRPCf(rpcName, "Receiving request")
-	ident, err := d.startService(request.GetType(), request.GetDockerImage())
+	serviceIdent, err := d.startService(request.GetType(), request.GetDockerImage())
 	if err != nil {
 		err := fmt.Errorf("Failed to start service: %w", err)
 		system.Errorf("Error starting service: %w", err)
@@ -81,48 +93,54 @@ func (d *Domain) StartService(ctx context.Context, request *grpc.StartServiceReq
 	}
 
 	reply := &grpc.StartServiceReply{
-		Service: identity.NewPBServiceIdentity(ident),
+		Service: ident.NewGRPCServiceIdentity(serviceIdent),
 	}
 
 	system.LogRPCf(rpcName, "Sending reply")
 	return reply, nil
 }
 
-func (d *Domain) startService(serviceType, dockerImage string) (identity.ServiceIdentity, error) {
+func (d *Domain) startService(serviceType, dockerImage string) (ident.ServiceIdentity, error) {
 	if _, ok := d.services.Load(serviceType); ok {
-		return identity.ServiceIdentity{}, fmt.Errorf("Service already exists! (%s)", serviceType)
+		return ident.ServiceIdentity{}, fmt.Errorf("Service already exists! (%s)", serviceType)
 	}
 
-	var dominionAddr identity.Address
-	d.Dominion.LatchRead(func(dominion *dominion.Dominion) error {
-		dominionAddr = dominion.Address
+	var dominionIdent ident.DominionIdentity
+	d.dominion.LatchRead(func(dominion *dominion.Dominion) error {
+		dominionIdent = dominion.DominionIdentity
 		return nil
 	})
-	uint16Max := (1 << 16) - 1
-	dominionIP := dominionAddr.IP
-	dominionPort := dominionAddr.Port
-	domainID := d.ID
-	servicePort := (rand.Intn(uint16Max) + d.Address.Port) % uint16Max
 
-	err := service.Start(serviceType, dockerImage, dominionIP, dominionPort, domainID, servicePort)
-	if err != nil {
-		return identity.ServiceIdentity{}, err
+	domainIdent := d.DomainIdentity
+
+	serviceIdent := ident.ServiceIdentity{
+		Identity: ident.Identity{
+			ID:      domainIdent.ID, // TODO: IDs need to be unique and generated idempotently
+			Version: domainIdent.Version,
+			Address: ident.Address{
+				IP:   domainIdent.Address.IP,
+				Port: getRandomPort(d.Address.Port),
+			},
+		},
+		Type: serviceType,
 	}
 
-	serviceIdent := identity.ServiceIdentity{
-		Type: serviceType,
-		Address: identity.Address{
-			IP:   d.Address.IP,
-			Port: servicePort,
-		},
+	err := service.Start(serviceIdent, domainIdent, dominionIdent, dockerImage)
+	if err != nil {
+		return ident.ServiceIdentity{}, err
 	}
 
 	// Give the service a little bit of time to start
+	// TODO: jmbarzee is there a better solution?
 	time.Sleep(config.GetDomainConfig().ServiceCheck * 3)
 
 	d.services.Store(serviceType, service.NewServiceGuard(serviceIdent))
-
-	system.Logf("Started service: \"%v\" at port:%v", serviceType, servicePort)
-
+	system.Logf("Started service: %s", serviceIdent.String())
 	return serviceIdent, nil
+}
+
+// getRandomPort returns a random port based on a seed
+func getRandomPort(seedPort int) int {
+	uint16Max := (1 << 16) - 1
+	return (rand.Intn(uint16Max) + seedPort) % uint16Max
 }

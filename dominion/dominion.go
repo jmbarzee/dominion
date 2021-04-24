@@ -2,14 +2,12 @@ package dominion
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/blang/semver"
 	"github.com/google/uuid"
 	"github.com/jmbarzee/dominion/dominion/config"
 	"github.com/jmbarzee/dominion/dominion/domain"
 	grpc "github.com/jmbarzee/dominion/grpc"
-	"github.com/jmbarzee/dominion/identity"
+	"github.com/jmbarzee/dominion/ident"
 	"github.com/jmbarzee/dominion/system"
 )
 
@@ -22,53 +20,23 @@ type Dominion struct {
 	// UnimplementedDominionServer is embedded to enable forwards compatability
 	grpc.UnimplementedDominionServer
 
-	id uuid.UUID
+	// DominionIdentity holds the identifying information for the Dominion
+	ident.DominionIdentity
 
 	// domains is a map of domains the dominion currently contains
 	domains domain.DomainMap
-
-	identity.DominionIdentity
 }
 
 // NewDominion creates a new dominion, to correctly build the dominion, just initilize
-func NewDominion(config config.DominionConfig) (*Dominion, error) {
+func NewDominion(c config.DominionConfig) (*Dominion, error) {
 
-	if err := system.Setup(config.ID, "dominion"); err != nil {
-		return nil, err
-	}
-
-	ident, err := NewDominionIdentity(config.Port)
-	if err != nil {
+	if err := system.Setup(c.ID, "dominion"); err != nil {
 		return nil, err
 	}
 
 	return &Dominion{
-		id:               config.ID,
 		domains:          domain.NewDomainMap(),
-		DominionIdentity: ident,
-	}, nil
-}
-
-// NewDominionIdentity creates a new DominionIdentity
-func NewDominionIdentity(port int) (identity.DominionIdentity, error) {
-	// Initialize Version
-	version, err := semver.Parse(system.Version)
-	if err != nil {
-		return identity.DominionIdentity{}, fmt.Errorf("failed to semver.Parse(%v): %v\n", version, err.Error())
-	}
-
-	// Initialize IP
-	ip, err := system.GetOutboundIP()
-	if err != nil {
-		return identity.DominionIdentity{}, fmt.Errorf("failed to find Local IP: %v\n", err.Error())
-	}
-
-	return identity.DominionIdentity{
-		Version: version,
-		Address: identity.Address{
-			IP:   ip,
-			Port: port,
-		},
+		DominionIdentity: c.DominionIdentity,
 	}, nil
 }
 
@@ -88,8 +56,8 @@ func (d Dominion) Run(ctx context.Context) error {
 
 	return d.hostDominion(ctx)
 }
-func (d *Dominion) packageDomains() []identity.DomainIdentity {
-	domainIdents := make([]identity.DomainIdentity, 0)
+func (d *Dominion) packageDomains() []ident.DomainIdentity {
+	domainIdents := make([]ident.DomainIdentity, 0)
 
 	d.domains.Range(func(id uuid.UUID, domainGuard *domain.DomainGuard) bool {
 		domainGuard.LatchRead(func(domain domain.Domain) error {
@@ -102,12 +70,19 @@ func (d *Dominion) packageDomains() []identity.DomainIdentity {
 	return domainIdents
 }
 
-func (d *Dominion) findService(serviceTypeRequested string) []identity.ServiceIdentity {
-	serviceIdents := make([]identity.ServiceIdentity, 0)
+func (d *Dominion) findService(serviceTypeRequested string) []ident.ServiceIdentity {
+	serviceIdents := make([]ident.ServiceIdentity, 0)
 
 	d.domains.Range(func(id uuid.UUID, domainGuard *domain.DomainGuard) bool {
 		domainGuard.LatchRead(func(domain domain.Domain) error {
-			serviceIdent, ok := domain.Services[serviceTypeRequested]
+			var serviceIdent ident.ServiceIdentity
+			ok := false
+			for _, sIdent := range domain.Services {
+				if sIdent.Type == serviceTypeRequested {
+					serviceIdent = sIdent
+					ok = true
+				}
+			}
 			if ok {
 				serviceIdents = append(serviceIdents, serviceIdent)
 			}
@@ -119,9 +94,9 @@ func (d *Dominion) findService(serviceTypeRequested string) []identity.ServiceId
 	return serviceIdents
 }
 
-func (d *Dominion) findServiceCanidates(serviceTypeRequested string) []identity.DomainIdentity {
+func (d *Dominion) findServiceCanidates(serviceTypeRequested string) []ident.DomainIdentity {
 	traitsNeeded := config.GetServicesConfig().Services[serviceTypeRequested].Traits
-	domainIdents := make([]identity.DomainIdentity, 0)
+	domainIdents := make([]ident.DomainIdentity, 0)
 
 	d.domains.Range(func(id uuid.UUID, domainGuard *domain.DomainGuard) bool {
 		domainGuard.LatchRead(func(domain domain.Domain) error {

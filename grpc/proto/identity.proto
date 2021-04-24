@@ -6,38 +6,36 @@ package grpc;
 
 // DominionIdentity represents a dominion
 message DominionIdentity {
-	// Address is the network address of the dominion
-	Address Address = 1;
-	// Version is the version of code being run by the dominion
-	string Version = 2;
-	// ID is a Unique Identifier for the dominion
-	bytes ID = 3;
+	// Identity is the identity of the Dominion
+	Identity Identity = 1;
 }
 
 
 // DomainIdentity represents a domain
 message DomainIdentity {
-	// Address is the network address of the domain
-	Address Address = 1;
-	// Version is the version of code being run by the domain
-	string Version = 2;
-	// ID is a Unique Identifier for the domain
-	bytes ID = 3;
+	// Identity is the identity of the domain
+	Identity Identity = 1;
 	// Traits is the list of traits of the domain
-	repeated string Traits = 4;
-	// Services is the list of services an Identity currently offers
-	map <string, ServiceIdentity> Services = 5;
+	repeated string Traits = 2;
 }
 
 
 // Service represents a service running under a domain
 message ServiceIdentity {
+	// Identity is the identity of the service
+	Identity Identity = 1;
 	// Type is the type of the service
-	string Type = 1;
-	// Address is the network address of the service
-	Address Address = 2;
-	// ID is a Unique Identifier for the service
-	bytes ID = 3;
+	string Type = 2;
+}
+
+// Identity holds identifying information for a service, domain, or dominion
+message Identity {
+	// ID is a unique identifier
+	bytes ID = 1;
+	// Version is the version of code being run
+	string Version = 2;
+	// Address is the network address where the identity is reachable
+	Address Address = 3;
 }
 
 message Address {

@@ -11,7 +11,7 @@ import (
 	"github.com/jmbarzee/dominion/dominion/config"
 	"github.com/jmbarzee/dominion/dominion/domain"
 	pb "github.com/jmbarzee/dominion/grpc"
-	"github.com/jmbarzee/dominion/identity"
+	"github.com/jmbarzee/dominion/ident"
 	"github.com/jmbarzee/dominion/system"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -56,13 +56,15 @@ Loop:
 			port := entry.Port
 			system.LogRoutinef(routineName, "Found broadcast - uuid:%v ip:%v port:%v", id, ip, port)
 
-			newDomainGuard := domain.NewDomainGuard(identity.DomainIdentity{
-				Address: identity.Address{
-					IP:   ip,
-					Port: port,
+			// Write a temp ident. Should be populated on first heartbeat
+			newDomainGuard := domain.NewDomainGuard(ident.DomainIdentity{
+				Identity: ident.Identity{
+					Address: ident.Address{
+						IP:   ip,
+						Port: port,
+					},
+					ID: id,
 				},
-				ID:       id,
-				Services: make(map[string]identity.ServiceIdentity),
 			})
 
 			// Add the new member
@@ -96,7 +98,8 @@ func (d *Dominion) checkServices(ctx context.Context, _ time.Time) {
 		domainGuard.LatchRead(func(domain domain.Domain) error {
 
 			// find service dependencies
-			for serviceType := range domain.DomainIdentity.Services {
+			for _, serviceIdent := range domain.Services {
+				serviceType := serviceIdent.Type
 				for _, dependency := range config.GetServicesConfig().Services[serviceType].Dependencies {
 					dependencies[dependency]++
 				}

@@ -1,11 +1,8 @@
 package service
 
 import (
-	"fmt"
-
-	"github.com/google/uuid"
 	pb "github.com/jmbarzee/dominion/grpc"
-	"github.com/jmbarzee/dominion/identity"
+	"github.com/jmbarzee/dominion/ident"
 	"github.com/jmbarzee/dominion/service/config"
 	"github.com/jmbarzee/dominion/service/dominion"
 	"github.com/jmbarzee/dominion/system"
@@ -21,9 +18,8 @@ type (
 		// UnimplementedServiceServer is embedded to enable forwards compatability
 		pb.UnimplementedServiceServer
 
-		DomainID uuid.UUID
-
-		identity.ServiceIdentity
+		// ServiceIdentity holds the identifying information for the Service
+		ident.ServiceIdentity
 
 		Server *grpc.Server
 
@@ -32,34 +28,16 @@ type (
 )
 
 // NewService builds a service from a ServiceConfig
-func NewService(config config.ServiceConfig) (*Service, error) {
-	if err := system.Setup(config.DomainID, config.ServiceType); err != nil {
+func NewService(c config.ServiceConfig) (*Service, error) {
+	if err := system.Setup(c.ID, c.Type); err != nil {
 		return nil, err
 	}
-	// Initialize IP
-	ip, err := system.GetOutboundIP()
-	if err != nil {
-		return nil, fmt.Errorf("failed to find Local IP: %w", err)
-	}
-
 	server := grpc.NewServer()
 
 	service := &Service{
-		DomainID: config.DomainID,
-		ServiceIdentity: identity.ServiceIdentity{
-			Type: config.ServiceType,
-			Address: identity.Address{
-				IP:   ip,
-				Port: config.ServicePort,
-			},
-		},
-		Server: server,
-		Dominion: dominion.NewDominionGuard(identity.DominionIdentity{
-			Address: identity.Address{
-				IP:   config.DominionIP,
-				Port: config.DominionPort,
-			},
-		}),
+		ServiceIdentity: c.ServiceIdentity,
+		Server:          server,
+		Dominion:        dominion.NewDominionGuard(c.DominionIdentity),
 	}
 
 	pb.RegisterServiceServer(service.Server, service)

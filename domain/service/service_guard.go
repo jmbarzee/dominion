@@ -3,7 +3,7 @@ package service
 import (
 	"sync"
 
-	"github.com/jmbarzee/dominion/identity"
+	"github.com/jmbarzee/dominion/ident"
 )
 
 // ServiceGuard protects a service for concurrent access
@@ -15,7 +15,7 @@ type ServiceGuard struct {
 }
 
 // NewServiceGuard returns a new ServiceGuard with the passed identity
-func NewServiceGuard(identity identity.ServiceIdentity) *ServiceGuard {
+func NewServiceGuard(identity ident.ServiceIdentity) *ServiceGuard {
 	return &ServiceGuard{
 		service: Service{
 			ServiceIdentity: identity,
