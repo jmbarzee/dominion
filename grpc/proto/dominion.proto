@@ -30,10 +30,18 @@ message GetServicesReply {
 
 // GetDomainsReply contains all domains and their services
 message GetDomainsReply {
-	// Domains is the list of all domains 
-	repeated DomainIdentity Domains = 1;
+	// DomainRecords is the list of all operating domains 
+	repeated DomainRecord DomainRecords = 1;
 }
 
 // Empty is empty, Duh.
 message Empty {
+}
+
+// DomainRecord is a snapshot of a currently opperating Domain
+message DomainRecord {
+	// DomainIdentity contains identifying information 
+	DomainIdentity DomainIdentity = 1;
+	// Services is the list of services a Domain currently offers
+	repeated ServiceIdentity Services = 2;
 }

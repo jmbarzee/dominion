@@ -25,7 +25,7 @@ message HeartbeatReply {
 	// Domain is the responding domainIdentity
 	DomainIdentity Domain = 1;
 	// Services is the list of services a Domain currently offers
-	repeated ServiceIdentity Services = 3;
+	repeated ServiceIdentity Services = 2;
 }
 
 
