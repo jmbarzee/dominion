@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jmbarzee/dominion/dominion/config"
 	"github.com/jmbarzee/dominion/dominion/domain"
-	grpc "github.com/jmbarzee/dominion/grpc"
+	"github.com/jmbarzee/dominion/grpc"
 	"github.com/jmbarzee/dominion/ident"
 	"github.com/jmbarzee/dominion/system"
 )
@@ -56,18 +56,22 @@ func (d Dominion) Run(ctx context.Context) error {
 
 	return d.hostDominion(ctx)
 }
-func (d *Dominion) packageDomains() []ident.DomainIdentity {
-	domainIdents := make([]ident.DomainIdentity, 0)
+func (d *Dominion) packageDomainRecords() []ident.DomainRecord {
+	domainRecords := make([]ident.DomainRecord, 0)
 
 	d.domains.Range(func(id uuid.UUID, domainGuard *domain.DomainGuard) bool {
 		domainGuard.LatchRead(func(domain domain.Domain) error {
-			domainIdents = append(domainIdents, domain.DomainIdentity)
+			record := ident.DomainRecord{
+				DomainIdentity: domain.DomainIdentity,
+				Services:       domain.Services,
+			}
+			domainRecords = append(domainRecords, record)
 			return nil
 		})
 		return true
 	})
 
-	return domainIdents
+	return domainRecords
 }
 
 func (d *Dominion) findService(serviceTypeRequested string) []ident.ServiceIdentity {

@@ -27,10 +27,11 @@ func (d *Dominion) GetServices(ctx context.Context, request *grpc.GetServicesReq
 
 // GetDomains implements grpc and returns all domains and their services
 func (d *Dominion) GetDomains(ctx context.Context, request *grpc.Empty) (*grpc.GetDomainsReply, error) {
-	rpcName := "GetAllServices"
+	rpcName := "GetDomains"
 	system.LogRPCf(rpcName, "Receiving request")
+
 	reply := &grpc.GetDomainsReply{
-		Domains: ident.NewGRPCDomainIdentityList(d.packageDomains()),
+		DomainRecords: ident.NewGRPCDomainRecordList(d.packageDomainRecords()),
 	}
 	system.LogRPCf(rpcName, "Sending reply")
 	return reply, nil
