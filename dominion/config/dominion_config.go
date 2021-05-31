@@ -1,14 +1,11 @@
 package config
 
 import (
-	"errors"
 	"fmt"
+	"path"
 	"time"
 
-	"github.com/BurntSushi/toml"
-
 	"github.com/jmbarzee/dominion/ident"
-	"github.com/jmbarzee/dominion/system"
 	"github.com/jmbarzee/dominion/system/config"
 )
 
@@ -17,6 +14,9 @@ type (
 	DominionConfig struct {
 		// DominionIdentity holds identifying information
 		ident.DominionIdentity
+
+		// LogFile is where logs are sent to
+		LogFile string
 
 		// DialTimeout is how long a domain will wait for a grpc.ClientConn to establish
 		DialTimeout time.Duration
@@ -30,59 +30,54 @@ type (
 	}
 )
 
-var dominionConfig *DominionConfig
-
-// GetDominionConfig returns the singleton DominionConfig
-func GetDominionConfig() DominionConfig {
-	if dominionConfig == nil {
-		system.Panic(errors.New("dominionConfig has not been intialized"))
-	}
-	return *dominionConfig
-}
-
-func setupDominionConfigFromTOML(configFilePath string) error {
-	if dominionConfig != nil {
-		return errors.New("dominionConfig has already been intialized")
-	}
-
-	bytes, err := config.ReadWholeConfigFile(configFilePath)
+func (c *DominionConfig) Patch() error {
+	patchedIdent, err := config.Patch(c.Identity)
 	if err != nil {
 		return err
 	}
+	c.Identity = patchedIdent
 
-	c := &DominionConfig{}
-	if err = toml.Unmarshal(bytes, c); err != nil {
-		return err
+	if c.LogFile == "" {
+		c.LogFile = path.Join(".", "logs", c.ID.String(), "dominion.log")
+		fmt.Printf("LogFile not specified, defaulting to '%v'.\n", c.LogFile)
 	}
 
-	c.Identity, err = config.Patch(c.Identity)
-	if err != nil {
-		return err
+	if c.DialTimeout == 0 {
+		c.DialTimeout = time.Duration(2000000000)
+		fmt.Printf("DialTimeout not specified, defaulting to %v.\n", c.DialTimeout)
 	}
 
-	if err = c.check(); err != nil {
-		return err
+	if c.DomainCheck == 0 {
+		c.DomainCheck = time.Duration(1000000000)
+		fmt.Printf("DomainCheck not specified, defaulting to %v.\n", c.DomainCheck)
 	}
 
-	dominionConfig = c
+	if c.ServiceCheck == 0 {
+		c.ServiceCheck = time.Duration(2000000000)
+		fmt.Printf("ServiceCheck not specified, defaulting to %v.\n", c.ServiceCheck)
+	}
 	return nil
+
 }
 
-func (c DominionConfig) check() error {
-
+func (c DominionConfig) Check() error {
 	err := config.Check(c.Identity)
 	if err != nil {
 		return err
 	}
 
+	if c.LogFile == "" {
+		return fmt.Errorf("configuration variable 'LogFile' was not set")
+	}
+
 	if c.DialTimeout == 0 {
-		return fmt.Errorf("configuration variable 'ConnectionConfig.DialTimeout' was not set")
+		return fmt.Errorf("configuration variable 'DialTimeout' was not set")
 	}
 	if c.DomainCheck == 0 {
-		return fmt.Errorf("configuration variable 'ConnectionConfig.HeartbeatCheck' was not set")
+		return fmt.Errorf("configuration variable 'HeartbeatCheck' was not set")
 	}
 	if c.ServiceCheck == 0 {
-		return fmt.Errorf("configuration variable 'ServiceHierarchyConfig.DependencyCheck' was not set")
+		return fmt.Errorf("configuration variable 'DependencyCheck' was not set")
 	}
 	return nil
 }

@@ -42,9 +42,10 @@ func (d *Dominion) rpcHeartbeat(ctx context.Context, domainGuard *domain.DomainG
 	id := uuid.Nil
 	err := domainGuard.LatchWrite(func(domain *domain.Domain) error {
 		id = domain.DomainIdentity.ID
+		cc := connect.NewConnectionConfig(d.config.DialTimeout)
 
-		if err := connect.CheckConnection(ctx, domain); err != nil {
-			return fmt.Errorf("Failed to check connection: %w", err)
+		if err := connect.CheckConnection(ctx, domain, cc); err != nil {
+			return fmt.Errorf("failed to check connection: %w", err)
 		}
 
 		// Prepare request
@@ -80,9 +81,10 @@ func (d *Dominion) rpcHeartbeat(ctx context.Context, domainGuard *domain.DomainG
 func (d *Dominion) rpcStartService(ctx context.Context, domainGuard *domain.DomainGuard, serviceType string) error {
 	rpcName := "StartService"
 	return domainGuard.LatchWrite(func(domain *domain.Domain) error {
+		cc := connect.NewConnectionConfig(d.config.DialTimeout)
 
-		if err := connect.CheckConnection(ctx, domain); err != nil {
-			return fmt.Errorf("Failed to check connection: %w", err)
+		if err := connect.CheckConnection(ctx, domain, cc); err != nil {
+			return fmt.Errorf("failed to check connection: %w", err)
 		}
 
 		// Prepare request

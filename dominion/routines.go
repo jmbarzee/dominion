@@ -24,13 +24,13 @@ func (d *Dominion) listenForBroadcasts(ctx context.Context) {
 
 	resolver, err := zeroconf.NewResolver(nil)
 	if err != nil {
-		system.Panic(fmt.Errorf("Failed to initialize resolver: %w", err))
+		system.Panic(fmt.Errorf("failed to initialize resolver: %w", err))
 	}
 
 	entries := make(chan *zeroconf.ServiceEntry)
 	err = resolver.Browse(ctx, "dominion", "local.", entries)
 	if err != nil {
-		system.Panic(fmt.Errorf("Failed to browse: %w", err))
+		system.Panic(fmt.Errorf("failed to browse: %w", err))
 	}
 
 	system.LogRoutinef(routineName, "Listening for broadcasts...")
@@ -81,7 +81,7 @@ Loop:
 func (d *Dominion) checkDomains(ctx context.Context, _ time.Time) {
 	d.domains.Range(func(id uuid.UUID, domainGuard *domain.DomainGuard) bool {
 		domainGuard.LatchRead(func(domain domain.Domain) error {
-			if time.Since(domain.LastContact) > config.GetDominionConfig().DomainCheck*10 {
+			if time.Since(domain.LastContact) > d.config.DomainCheck*10 {
 				// its been a while, make sure they are still alive
 				go d.rpcHeartbeat(ctx, domainGuard)
 			}
@@ -113,17 +113,17 @@ func (d *Dominion) checkServices(ctx context.Context, _ time.Time) {
 	for dependency := range dependencies {
 
 		if len(d.findService(dependency)) == 0 {
-			canidates := d.findServiceCanidates(dependency)
-			if len(canidates) == 0 {
-				system.Errorf("No canidates available for %v", dependency)
+			candidates := d.findServiceCandidates(dependency)
+			if len(candidates) == 0 {
+				system.Errorf("No candidates available for %v", dependency)
 				continue
 			}
 
 			// TODO Handle multiples
-			canidate := canidates[0]
-			domainGuard, ok := d.domains.Load(canidate.ID)
+			candidate := candidates[0]
+			domainGuard, ok := d.domains.Load(candidate.ID)
 			if !ok {
-				system.Errorf("Viable canidate no longer available for %v", dependency)
+				system.Errorf("Viable candidate no longer available for %v", dependency)
 				continue
 			}
 

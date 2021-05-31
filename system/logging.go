@@ -7,8 +7,6 @@ import (
 	"os"
 	"os/signal"
 	"path"
-
-	"github.com/google/uuid"
 )
 
 const (
@@ -16,9 +14,7 @@ const (
 	// PathBase is the location of all dominion src files
 	PathBase = "/usr/local/dominion"
 	// PathLogs is the location of all dominion log files
-	PathLogs = PathBase + "/logs"
-	// PathServices is the location of all dominion services
-	PathServices = PathBase + "/services"
+	PathLogs = "/usr/local/dominion/logs"
 )
 
 // log is where normal & debugging messages are dumped to
@@ -26,21 +22,19 @@ var logger *log.Logger
 var closeFile func() error
 
 // Setup initializes logging and signal handling
-func Setup(id uuid.UUID, fileName string) error {
+func Setup(logFilePath string) error {
 	if logger != nil {
 		return errors.New("system.Setup has already been called")
 	}
 
-	pathIDLogs := path.Join(PathLogs, id.String())
-	err := os.MkdirAll(pathIDLogs, 0755)
+	err := os.MkdirAll(path.Dir(logFilePath), 0755)
 	if err != nil {
-		return fmt.Errorf("failed to check ensure log directory \"%v\" exists: %w", pathIDLogs, err)
+		return fmt.Errorf("failed to check ensure log directory \"%v\" exists: %w", path.Dir(logFilePath), err)
 	}
 
-	pathIDLogFile := path.Join(pathIDLogs, fileName+".log")
-	logFile, err := os.OpenFile(pathIDLogFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	logFile, err := os.OpenFile(logFilePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
-		return fmt.Errorf("failed to check open log file \"%v\" exists: %w", pathIDLogFile, err)
+		return fmt.Errorf("failed to open log file \"%v\": %w", logFilePath, err)
 	}
 	closeFile := logFile.Close
 	logger = log.New(logFile, "", log.LstdFlags)

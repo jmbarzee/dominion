@@ -1,10 +1,7 @@
 package dominion
 
 import (
-	"time"
-
 	"github.com/jmbarzee/dominion/ident"
-	"github.com/jmbarzee/dominion/service/config"
 	"google.golang.org/grpc"
 )
 
@@ -31,9 +28,4 @@ func (d Dominion) GetConnection() *grpc.ClientConn {
 // SetConnection replaces the connection of the device (any existing connection will be closed prior to this)
 func (d *Dominion) SetConnection(newConn *grpc.ClientConn) {
 	d.Conn = newConn
-}
-
-// GetTimeout returns the timeout for dialing a new connection
-func (Dominion) GetTimeout() time.Duration {
-	return config.DefaultServiceDialTimeout
 }

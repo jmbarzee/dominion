@@ -1,6 +1,16 @@
 // all logfiles
+logs/
 *.log
 
 // vscode
 launch.json
-.history
+.history/
+
+// binaries
+bin/
+
+// envionment configuration for binaries
+env
+
+// Note files
+TODO

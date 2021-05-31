@@ -6,7 +6,6 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/jmbarzee/dominion/domain/config"
 	"github.com/jmbarzee/dominion/domain/dominion"
 	service "github.com/jmbarzee/dominion/domain/service"
 	grpc "github.com/jmbarzee/dominion/grpc"
@@ -46,8 +45,9 @@ func (d *Domain) rpcHeartbeat(ctx context.Context, serviceGuard *service.Service
 	serviceType := ""
 	err := serviceGuard.LatchWrite(func(service *service.Service) error {
 		serviceType = service.Type
+		cc := connect.NewConnectionConfig(d.config.DialTimeout)
 
-		if err := connect.CheckConnection(ctx, service); err != nil {
+		if err := connect.CheckConnection(ctx, service, cc); err != nil {
 			return fmt.Errorf("Failed to check connection: %w", err)
 		}
 
@@ -132,7 +132,7 @@ func (d *Domain) startService(serviceType, dockerImage string) (ident.ServiceIde
 
 	// Give the service a little bit of time to start
 	// TODO: jmbarzee is there a better solution?
-	time.Sleep(config.GetDomainConfig().ServiceCheck * 3)
+	time.Sleep(d.config.ServiceCheck * 3)
 
 	d.services.Store(serviceType, service.NewServiceGuard(serviceIdent))
 	system.Logf("Started service: %s", serviceIdent.String())

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/grandcat/zeroconf"
-	"github.com/jmbarzee/dominion/domain/config"
 	"github.com/jmbarzee/dominion/domain/dominion"
 	"github.com/jmbarzee/dominion/domain/service"
 	pb "github.com/jmbarzee/dominion/grpc"
@@ -19,7 +18,7 @@ import (
 func (d *Domain) checkServices(ctx context.Context, _ time.Time) {
 	d.services.Range(func(uuid string, serviceGuard *service.ServiceGuard) bool {
 		serviceGuard.LatchRead(func(service service.Service) error {
-			if time.Since(service.LastContact) > config.GetDomainConfig().ServiceCheck*10 {
+			if time.Since(service.LastContact) > d.config.ServiceCheck*10 {
 				// its been a while, make sure they are still alive
 				go d.rpcHeartbeat(ctx, serviceGuard)
 			}
@@ -35,7 +34,7 @@ func (d *Domain) checkIsolation(ctx context.Context, _ time.Time) {
 		shouldBeBroadcasting = true
 	} else {
 		d.dominion.LatchRead(func(dominion *dominion.Dominion) error {
-			if time.Since(dominion.LastContact) < config.GetDomainConfig().IsolationCheck*10 {
+			if time.Since(dominion.LastContact) < d.config.IsolationCheck*10 {
 				// Dominion hasn't expired
 				if d.stopBroadcastSelf != nil {
 					d.stopBroadcastSelf()

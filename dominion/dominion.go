@@ -12,7 +12,7 @@ import (
 )
 
 // Dominion is the leader of the Domains
-// The Dominion is responsisble for:
+// The Dominion is responsable for:
 //  - Listen for broadcasts from new/lonely Domains
 //  - Heartbeats to connected Domains
 //  - Command Domains to start new services
@@ -25,18 +25,22 @@ type Dominion struct {
 
 	// domains is a map of domains the dominion currently contains
 	domains domain.DomainMap
+
+	// config is the initial configuration for the Dominion
+	config config.DominionConfig
 }
 
-// NewDominion creates a new dominion, to correctly build the dominion, just initilize
+// NewDominion creates a new dominion, to correctly build the dominion, just initialize
 func NewDominion(c config.DominionConfig) (*Dominion, error) {
 
-	if err := system.Setup(c.ID, "dominion"); err != nil {
+	if err := system.Setup(c.LogFile); err != nil {
 		return nil, err
 	}
 
 	return &Dominion{
 		domains:          domain.NewDomainMap(),
 		DominionIdentity: c.DominionIdentity,
+		config:           c,
 	}, nil
 }
 
@@ -50,12 +54,13 @@ func (d Dominion) Run(ctx context.Context) error {
 	system.Logf("The Dominion ever expands!\n")
 
 	// Start Routines
-	go system.RoutineOperation(ctx, "checkDomains", config.GetDominionConfig().DomainCheck, d.checkDomains)
-	go system.RoutineOperation(ctx, "checkServices", config.GetDominionConfig().ServiceCheck, d.checkServices)
+	go system.RoutineOperation(ctx, "checkDomains", d.config.DomainCheck, d.checkDomains)
+	go system.RoutineOperation(ctx, "checkServices", d.config.ServiceCheck, d.checkServices)
 	go d.listenForBroadcasts(ctx)
 
 	return d.hostDominion(ctx)
 }
+
 func (d *Dominion) packageDomainRecords() []ident.DomainRecord {
 	domainRecords := make([]ident.DomainRecord, 0)
 
@@ -98,7 +103,7 @@ func (d *Dominion) findService(serviceTypeRequested string) []ident.ServiceIdent
 	return serviceIdents
 }
 
-func (d *Dominion) findServiceCanidates(serviceTypeRequested string) []ident.DomainIdentity {
+func (d *Dominion) findServiceCandidates(serviceTypeRequested string) []ident.DomainIdentity {
 	traitsNeeded := config.GetServicesConfig().Services[serviceTypeRequested].Traits
 	domainIdents := make([]ident.DomainIdentity, 0)
 

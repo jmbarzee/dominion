@@ -5,6 +5,7 @@ import (
 
 	pb "github.com/jmbarzee/dominion/grpc"
 	"github.com/jmbarzee/dominion/ident"
+	"github.com/jmbarzee/dominion/service/config"
 	"github.com/jmbarzee/dominion/service/dominion"
 	"github.com/jmbarzee/dominion/system"
 	"github.com/jmbarzee/dominion/system/connect"
@@ -30,8 +31,10 @@ func (s Service) RPCGetServices(ctx context.Context, serviceType string) ([]iden
 	services := []ident.ServiceIdentity{}
 
 	err := s.Dominion.LatchWrite(func(dominion *dominion.Dominion) error {
-		err := connect.CheckConnection(ctx, dominion)
-		if err != nil {
+
+		cc := connect.NewConnectionConfig(config.DefaultServiceDialTimeout)
+
+		if err := connect.CheckConnection(ctx, dominion, cc); err != nil {
 			return err
 		}
 

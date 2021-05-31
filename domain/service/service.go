@@ -3,7 +3,6 @@ package service
 import (
 	"time"
 
-	"github.com/jmbarzee/dominion/domain/config"
 	"github.com/jmbarzee/dominion/ident"
 	"google.golang.org/grpc"
 )
@@ -34,9 +33,4 @@ func (s Service) GetConnection() *grpc.ClientConn {
 // SetConnection replaces the connection of the device (any existing connection will be closed prior to this)
 func (s *Service) SetConnection(newConn *grpc.ClientConn) {
 	s.Conn = newConn
-}
-
-// GetTimeout returns the timeout for dialing a new connection
-func (Service) GetTimeout() time.Duration {
-	return config.GetDomainConfig().DialTimeout
 }

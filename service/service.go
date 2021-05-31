@@ -24,12 +24,14 @@ type (
 		Server *grpc.Server
 
 		Dominion *dominion.DominionGuard
+
+		Config config.ServiceConfig
 	}
 )
 
 // NewService builds a service from a ServiceConfig
 func NewService(c config.ServiceConfig) (*Service, error) {
-	if err := system.Setup(c.ID, c.Type); err != nil {
+	if err := system.Setup(c.LogFile); err != nil {
 		return nil, err
 	}
 	server := grpc.NewServer()
@@ -38,6 +40,7 @@ func NewService(c config.ServiceConfig) (*Service, error) {
 		ServiceIdentity: c.ServiceIdentity,
 		Server:          server,
 		Dominion:        dominion.NewDominionGuard(c.DominionIdentity),
+		Config:          c,
 	}
 
 	pb.RegisterServiceServer(service.Server, service)

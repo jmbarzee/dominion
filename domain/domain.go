@@ -27,19 +27,24 @@ type (
 		//     ServiceType -> Service
 		services service.ServiceMap
 
+		// stopBroadcastSelf is a handle to end network broadcasting
 		stopBroadcastSelf context.CancelFunc
+
+		// config is the initial configuration for the Dominion
+		config config.DomainConfig
 	}
 )
 
-// NewDomain creates a new Domain, to correctly build the Domain, just initilize
+// NewDomain creates a new Domain, to correctly build the Domain, just initialize
 func NewDomain(c config.DomainConfig) (*Domain, error) {
-	if err := system.Setup(c.ID, "domain"); err != nil {
+	if err := system.Setup(c.LogFile); err != nil {
 		return nil, err
 	}
 
 	return &Domain{
 		services:       service.NewServiceMap(),
 		DomainIdentity: c.DomainIdentity,
+		config:         c,
 	}, nil
 }
 
@@ -49,8 +54,8 @@ func (d Domain) Run(ctx context.Context) error {
 	system.Logf("The Dominion ever expands!\n")
 
 	// Start Auto Connecting Routines
-	go system.RoutineOperation(ctx, "checkIsolation", config.GetDomainConfig().IsolationCheck, d.checkIsolation)
-	go system.RoutineOperation(ctx, "checkServices", config.GetDomainConfig().ServiceCheck, d.checkServices)
+	go system.RoutineOperation(ctx, "checkIsolation", d.config.IsolationCheck, d.checkIsolation)
+	go system.RoutineOperation(ctx, "checkServices", d.config.ServiceCheck, d.checkServices)
 
 	return d.hostDomain(ctx)
 }
@@ -75,7 +80,7 @@ func (d *Domain) updateDominion(ident ident.DominionIdentity) error {
 	} else {
 		return d.dominion.LatchWrite(func(dominion *dominion.Dominion) error {
 			if dominion.Address.String() != ident.Address.String() {
-				return fmt.Errorf("Dominion Address doesn't known dominion")
+				return fmt.Errorf("dominion Address doesn't known dominion")
 			} else {
 				dominion.LastContact = time.Now()
 				return nil

@@ -3,9 +3,7 @@ package config
 import (
 	"errors"
 
-	"github.com/BurntSushi/toml"
 	"github.com/jmbarzee/dominion/system"
-	"github.com/jmbarzee/dominion/system/config"
 )
 
 type (
@@ -26,6 +24,7 @@ type (
 
 var servicesConfig *ServicesConfig
 
+// SetServicesConfig gets the singleton servicesConfig
 func GetServicesConfig() ServicesConfig {
 	if servicesConfig == nil {
 		system.Panic(errors.New("servicesConfig has not been intialized"))
@@ -33,23 +32,12 @@ func GetServicesConfig() ServicesConfig {
 	return *servicesConfig
 }
 
-func setupServicesConfigFromTOML(configFilePath string) error {
+// SetServicesConfig sets the singleton servicesConfig
+func SetServicesConfig(c ServicesConfig) {
 	if servicesConfig != nil {
-		return errors.New("servicesConfig has already been intialized")
+		system.Panic(errors.New("servicesConfig has already been intialized"))
 	}
-
-	bytes, err := config.ReadWholeConfigFile(configFilePath)
-	if err != nil {
-		return err
-	}
-
-	config := &ServicesConfig{}
-	if err = toml.Unmarshal(bytes, config); err != nil {
-		return err
-	}
-
-	servicesConfig = config
-	return nil
+	servicesConfig = &c
 }
 
 func (s ServiceDefinition) String() string {

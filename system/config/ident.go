@@ -2,9 +2,7 @@ package config
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net"
-	"os"
 
 	"github.com/google/uuid"
 	"github.com/jmbarzee/dominion"
@@ -111,12 +109,4 @@ func getOutboundIP() (net.IP, error) {
 	localAddr := conn.LocalAddr().(*net.UDPAddr)
 
 	return localAddr.IP, nil
-}
-
-func ReadWholeConfigFile(configFilePath string) ([]byte, error) {
-	configFile, err := os.OpenFile(configFilePath, os.O_RDONLY, 0666)
-	if err != nil {
-		return nil, err
-	}
-	return ioutil.ReadAll(configFile)
 }
