@@ -5,15 +5,15 @@ import (
 )
 
 type DomainRecord struct {
-	// DomainIdentity holds the identifying information of the domain
-	DomainIdentity
+	// Identity holds the identifying information of the domain
+	Identity
 
 	// Services
 	Services []ServiceIdentity
 }
 
 func NewDomainRecord(grpcDomainRecord *grpc.DomainRecord) (DomainRecord, error) {
-	domainIdentity, err := NewDomainIdentity(grpcDomainRecord.DomainIdentity)
+	domainIdentity, err := NewIdentity(grpcDomainRecord.Identity)
 	if err != nil {
 		return DomainRecord{}, err
 	}
@@ -24,15 +24,15 @@ func NewDomainRecord(grpcDomainRecord *grpc.DomainRecord) (DomainRecord, error) 
 	}
 
 	return DomainRecord{
-		DomainIdentity: domainIdentity,
-		Services:       serviceIdentityList,
+		Identity: domainIdentity,
+		Services: serviceIdentityList,
 	}, nil
 }
 
 func NewGRPCDomainRecord(domainRecord DomainRecord) *grpc.DomainRecord {
 	return &grpc.DomainRecord{
-		DomainIdentity: NewGRPCDomainIdentity(domainRecord.DomainIdentity),
-		Services:       NewGRPCServiceIdentityList(domainRecord.Services),
+		Identity: NewGRPCIdentity(domainRecord.Identity),
+		Services: NewGRPCServiceIdentityList(domainRecord.Services),
 	}
 }
 

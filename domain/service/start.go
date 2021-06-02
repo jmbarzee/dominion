@@ -11,7 +11,7 @@ import (
 )
 
 // Start calls make from the services directory to start a new service
-func Start(serviceIdent ident.ServiceIdentity, domainIdent ident.DomainIdentity, dominionIdent ident.DominionIdentity, dockerImage string) error {
+func Start(serviceIdent ident.ServiceIdentity, domainIdent ident.Identity, dominionIdent ident.Identity, dockerImage string) error {
 	system.Logf("Starting %v!", serviceIdent.Type)
 	system.Logf("Using image: %v", dockerImage)
 

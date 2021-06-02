@@ -21,7 +21,7 @@ type Dominion struct {
 	grpc.UnimplementedDominionServer
 
 	// DominionIdentity holds the identifying information for the Dominion
-	ident.DominionIdentity
+	ident.Identity
 
 	// domains is a map of domains the dominion currently contains
 	domains domain.DomainMap
@@ -38,9 +38,9 @@ func NewDominion(c config.DominionConfig) (*Dominion, error) {
 	}
 
 	return &Dominion{
-		domains:          domain.NewDomainMap(),
-		DominionIdentity: c.DominionIdentity,
-		config:           c,
+		domains:  domain.NewDomainMap(),
+		Identity: c.Identity,
+		config:   c,
 	}, nil
 }
 
@@ -50,7 +50,7 @@ func (d Dominion) Run(ctx context.Context) error {
 
 	// Intro log
 	system.Logf("I am the Dominion\n")
-	system.Logf(d.DominionIdentity.String())
+	system.Logf(d.Identity.String())
 	system.Logf("The Dominion ever expands!\n")
 
 	// Start Routines
@@ -67,8 +67,8 @@ func (d *Dominion) packageDomainRecords() []ident.DomainRecord {
 	d.domains.Range(func(id uuid.UUID, domainGuard *domain.DomainGuard) bool {
 		domainGuard.LatchRead(func(domain domain.Domain) error {
 			record := ident.DomainRecord{
-				DomainIdentity: domain.DomainIdentity,
-				Services:       domain.Services,
+				Identity: domain.Identity,
+				Services: domain.Services,
 			}
 			domainRecords = append(domainRecords, record)
 			return nil
@@ -103,15 +103,14 @@ func (d *Dominion) findService(serviceTypeRequested string) []ident.ServiceIdent
 	return serviceIdents
 }
 
-func (d *Dominion) findServiceCandidates(serviceTypeRequested string) []ident.DomainIdentity {
-	traitsNeeded := config.GetServicesConfig().Services[serviceTypeRequested].Traits
-	domainIdents := make([]ident.DomainIdentity, 0)
+func (d *Dominion) findServiceCandidates(serviceTypeRequested string) []ident.Identity {
+	domainIdents := make([]ident.Identity, 0)
 
 	d.domains.Range(func(id uuid.UUID, domainGuard *domain.DomainGuard) bool {
 		domainGuard.LatchRead(func(domain domain.Domain) error {
-			if domain.HasTraits(traitsNeeded) {
-				domainIdents = append(domainIdents, domain.DomainIdentity)
-			}
+			// if domain.HasTraits(traitsNeeded) {
+			domainIdents = append(domainIdents, domain.Identity)
+			// }
 			return nil
 		})
 		return true

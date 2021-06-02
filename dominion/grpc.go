@@ -41,7 +41,7 @@ func (d *Dominion) rpcHeartbeat(ctx context.Context, domainGuard *domain.DomainG
 	rpcName := "Heartbeat"
 	id := uuid.Nil
 	err := domainGuard.LatchWrite(func(domain *domain.Domain) error {
-		id = domain.DomainIdentity.ID
+		id = domain.Identity.ID
 		cc := connect.NewConnectionConfig(d.config.DialTimeout)
 
 		if err := connect.CheckConnection(ctx, domain, cc); err != nil {
@@ -50,7 +50,7 @@ func (d *Dominion) rpcHeartbeat(ctx context.Context, domainGuard *domain.DomainG
 
 		// Prepare request
 		request := &grpc.HeartbeatRequest{
-			Dominion: ident.NewGRPCDominionIdentity(d.DominionIdentity),
+			Dominion: ident.NewGRPCIdentity(d.Identity),
 		}
 
 		// Send RPC
@@ -64,11 +64,11 @@ func (d *Dominion) rpcHeartbeat(ctx context.Context, domainGuard *domain.DomainG
 
 		// Update domain
 		domain.LastContact = time.Now()
-		domainIdent, err := ident.NewDomainIdentity(reply.GetDomain())
+		domainIdent, err := ident.NewIdentity(reply.GetDomain())
 		if err != nil {
 			return err
 		}
-		domain.DomainIdentity = domainIdent
+		domain.Identity = domainIdent
 		return nil
 	})
 

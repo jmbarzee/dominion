@@ -40,8 +40,8 @@ message Empty {
 
 // DomainRecord is a snapshot of a currently opperating Domain
 message DomainRecord {
-	// DomainIdentity contains identifying information 
-	DomainIdentity DomainIdentity = 1;
+	// Identity contains identifying information 
+	Identity Identity = 1;
 	// Services is the list of services a Domain currently offers
 	repeated ServiceIdentity Services = 2;
 }

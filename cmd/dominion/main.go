@@ -24,14 +24,12 @@ func main() {
 	}
 
 	c := config.DominionConfig{
-		DominionIdentity: ident.DominionIdentity{
-			Identity: ident.Identity{
-				ID:      id,
-				Version: dd.Version(),
-				Address: ident.Address{
-					IP:   net.ParseIP(syscfg.RequestEnvString("DOMINION_IP")),
-					Port: syscfg.RequireEnvInt("DOMINION_PORT"),
-				},
+		Identity: ident.Identity{
+			ID:      id,
+			Version: dd.Version(),
+			Address: ident.Address{
+				IP:   net.ParseIP(syscfg.RequestEnvString("DOMINION_IP")),
+				Port: syscfg.RequireEnvInt("DOMINION_PORT"),
 			},
 		},
 		LogFile:      syscfg.RequestEnvString("DOMINION_LOG_FILE"),

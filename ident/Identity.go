@@ -51,6 +51,29 @@ func (i Identity) String() string {
 	return fmt.Sprintf("{ %s, %s, %s}", i.ID.String(), i.Version.String(), i.Address.String())
 }
 
+// NewIdentityList creates a list of new Identitys from a list of grpc.Identity
+func NewIdentityList(grpcDIdents []*grpc.Identity) ([]Identity, error) {
+	dIdents := make([]Identity, len(grpcDIdents))
+	for i, grpcDIdent := range grpcDIdents {
+		dIdent, err := NewIdentity(grpcDIdent)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing Identity: %w", err)
+		}
+		dIdents[i] = dIdent
+	}
+	return dIdents, nil
+}
+
+// NewGRPCIdentityList creates a list of new Identitys from a list of grpc.Identity
+func NewGRPCIdentityList(dIdents []Identity) []*grpc.Identity {
+
+	grpcDIdents := make([]*grpc.Identity, len(dIdents))
+	for i, dIdent := range dIdents {
+		grpcDIdents[i] = NewGRPCIdentity(dIdent)
+	}
+	return grpcDIdents
+}
+
 // Address is a IP and port combination
 type Address struct {
 	// IP is the ip which the Domain will be responding on

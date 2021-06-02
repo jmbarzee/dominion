@@ -11,8 +11,8 @@ import (
 // Domain is a representation of a domain service somewhere on the network
 // Domain implements system.Connectable
 type Domain struct {
-	// DomainIdentity holds the identifying information of the domain
-	ident.DomainIdentity
+	// Identity holds the identifying information of the domain
+	ident.Identity
 
 	// Services
 	Services []ident.ServiceIdentity
@@ -26,7 +26,7 @@ type Domain struct {
 
 // GetAddress returns the target address for the connection
 func (d Domain) GetAddress() ident.Address {
-	return d.Identity.Address
+	return d.Address
 }
 
 // GetConnection returns a current gRCP connection (for checking)

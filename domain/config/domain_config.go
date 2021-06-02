@@ -13,8 +13,8 @@ import (
 type (
 	// DomainConfig holds all the information required to start a Domain
 	DomainConfig struct {
-		// DomainIdentity holds identifying information
-		ident.DomainIdentity
+		// Identity holds identifying information
+		ident.Identity
 
 		// LogFile is where logs are sent to
 		LogFile string
@@ -63,10 +63,6 @@ func (c DomainConfig) Check() error {
 		return err
 	}
 
-	if len(c.Traits) == 0 {
-		fmt.Println("Warning: Traits were not defined.")
-	}
-
 	if c.LogFile == "" {
 		return fmt.Errorf("configuration variable 'LogFile' was not set")
 	}
@@ -86,16 +82,9 @@ func (c DomainConfig) Check() error {
 
 func (c DomainConfig) String() string {
 
-	dumpMsg := "\tIdentity: " + c.Identity.String() + "\n"
-
-	dumpMsg += "\tTraits: ["
-	for _, trait := range c.Traits {
-		dumpMsg += trait + ", "
-	}
-	dumpMsg += "]\n"
-
-	dumpMsg += "\tDialTimeout: \n" + strconv.Itoa(int(c.DialTimeout)) +
-		"\tServiceCheck: \n" + strconv.Itoa(int(c.ServiceCheck)) +
-		"\tIsolationCheck: \n" + strconv.Itoa(int(c.IsolationCheck))
+	dumpMsg := "\tIdentity: " + c.Identity.String() + "\n" +
+		"\tDialTimeout: " + strconv.Itoa(int(c.DialTimeout)) + "\n" +
+		"\tServiceCheck: " + strconv.Itoa(int(c.ServiceCheck)) + "\n" +
+		"\tIsolationCheck: " + strconv.Itoa(int(c.IsolationCheck)) + "\n"
 	return dumpMsg
 }

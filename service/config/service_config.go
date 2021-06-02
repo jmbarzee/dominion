@@ -13,11 +13,11 @@ type ServiceConfig struct {
 	// ServiceIdentity holds identifying information
 	ident.ServiceIdentity
 
-	// DomainIdentity holds identifying information for the domain
-	DomainIdentity ident.DomainIdentity
+	// Identity holds identifying information for the domain
+	DomainIdentity ident.Identity
 
 	// DominionIdentity holds identifying information for the dominion
-	DominionIdentity ident.DominionIdentity
+	DominionIdentity ident.Identity
 
 	// LogFile is where logs are sent to
 	LogFile string
@@ -34,13 +34,13 @@ func FromEnv(serviceType string) (ServiceConfig, error) {
 		return ServiceConfig{}, err
 	}
 
-	domainIdent := ident.DomainIdentity{}
+	domainIdent := ident.Identity{}
 	domainIdentString := config.RequireEnvString("DOMAIN_IDENTITY")
 	if err := json.Unmarshal([]byte(domainIdentString), &domainIdent); err != nil {
 		return ServiceConfig{}, err
 	}
 
-	dominionIdent := ident.DominionIdentity{}
+	dominionIdent := ident.Identity{}
 	dominionIdentString := config.RequireEnvString("DOMINION_IDENTITY")
 	if err := json.Unmarshal([]byte(dominionIdentString), &dominionIdent); err != nil {
 		return ServiceConfig{}, err

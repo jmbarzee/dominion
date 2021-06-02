@@ -20,7 +20,7 @@ func (d *Domain) Heartbeat(ctx context.Context, request *grpc.HeartbeatRequest) 
 	rpcName := "Heartbeat"
 	system.LogRPCf(rpcName, "Receiving request")
 
-	dominionIdent, err := ident.NewDominionIdentity(request.GetDominion())
+	dominionIdent, err := ident.NewIdentity(request.GetDominion())
 	if err != nil {
 		system.LogRPCf(rpcName, "Error: %s", err.Error())
 		return nil, err
@@ -33,7 +33,7 @@ func (d *Domain) Heartbeat(ctx context.Context, request *grpc.HeartbeatRequest) 
 
 	// Prepare reply
 	reply := &grpc.HeartbeatReply{
-		Domain:   ident.NewGRPCDomainIdentity(d.DomainIdentity),
+		Domain:   ident.NewGRPCIdentity(d.Identity),
 		Services: ident.NewGRPCServiceIdentityList(d.packageServices()),
 	}
 	system.LogRPCf(rpcName, "Sending reply")
@@ -53,7 +53,7 @@ func (d *Domain) rpcHeartbeat(ctx context.Context, serviceGuard *service.Service
 
 		// Prepare request
 		request := &grpc.ServiceHeartbeatRequest{
-			Domain: ident.NewGRPCDomainIdentity(d.DomainIdentity),
+			Domain: ident.NewGRPCIdentity(d.Identity),
 		}
 
 		// Send RPC
@@ -105,13 +105,13 @@ func (d *Domain) startService(serviceType, dockerImage string) (ident.ServiceIde
 		return ident.ServiceIdentity{}, fmt.Errorf("Service already exists! (%s)", serviceType)
 	}
 
-	var dominionIdent ident.DominionIdentity
+	var dominionIdent ident.Identity
 	d.dominion.LatchRead(func(dominion *dominion.Dominion) error {
-		dominionIdent = dominion.DominionIdentity
+		dominionIdent = dominion.Identity
 		return nil
 	})
 
-	domainIdent := d.DomainIdentity
+	domainIdent := d.Identity
 
 	serviceIdent := ident.ServiceIdentity{
 		Identity: ident.Identity{

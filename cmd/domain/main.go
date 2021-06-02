@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"net"
 	"runtime"
 	"time"
@@ -23,24 +22,13 @@ func main() {
 		panic(err)
 	}
 
-	var traits []string
-	traitsString := syscfg.RequestEnvString("DOMAIN_TRAITS")
-	if traitsString != "" {
-		if err := json.Unmarshal([]byte(traitsString), &traits); err != nil {
-			panic(err)
-		}
-	}
-
 	c := config.DomainConfig{
-		DomainIdentity: ident.DomainIdentity{
-			Identity: ident.Identity{
-				ID: id,
-				Address: ident.Address{
-					IP:   net.ParseIP(syscfg.RequestEnvString("DOMAIN_IP")),
-					Port: syscfg.RequireEnvInt("DOMAIN_PORT"),
-				},
+		Identity: ident.Identity{
+			ID: id,
+			Address: ident.Address{
+				IP:   net.ParseIP(syscfg.RequestEnvString("DOMAIN_IP")),
+				Port: syscfg.RequireEnvInt("DOMAIN_PORT"),
 			},
-			Traits: traits,
 		},
 		LogFile:        syscfg.RequestEnvString("DOMAIN_LOG_FILE"),
 		DialTimeout:    time.Duration(syscfg.RequestEnvInt("DOMAIN_DIAL_TIMEOUT")),

@@ -15,10 +15,10 @@ type DominionGuard struct {
 }
 
 // NewDominionGuard returns a new DominionGuard with the passed identity
-func NewDominionGuard(identity ident.DominionIdentity) *DominionGuard {
+func NewDominionGuard(identity ident.Identity) *DominionGuard {
 	return &DominionGuard{
 		dominion: Dominion{
-			DominionIdentity: identity,
+			Identity: identity,
 		},
 	}
 }

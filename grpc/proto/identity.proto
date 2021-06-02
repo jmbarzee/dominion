@@ -4,22 +4,6 @@ option go_package = "github.com/jmbarzee/dominion/grpc";
 package grpc;
 
 
-// DominionIdentity represents a dominion
-message DominionIdentity {
-	// Identity is the identity of the Dominion
-	Identity Identity = 1;
-}
-
-
-// DomainIdentity represents a domain
-message DomainIdentity {
-	// Identity is the identity of the domain
-	Identity Identity = 1;
-	// Traits is the list of traits of the domain
-	repeated string Traits = 2;
-}
-
-
 // Service represents a service running under a domain
 message ServiceIdentity {
 	// Identity is the identity of the service

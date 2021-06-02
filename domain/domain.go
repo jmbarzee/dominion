@@ -18,8 +18,8 @@ type (
 		// UnimplementedDomainServer is embedded to enable forwards compatability
 		grpc.UnimplementedDomainServer
 
-		// DomainIdentity holds Identifying information for the Domain
-		ident.DomainIdentity
+		// Identity holds Identifying information for the Domain
+		ident.Identity
 
 		dominion *dominion.DominionGuard
 
@@ -42,15 +42,15 @@ func NewDomain(c config.DomainConfig) (*Domain, error) {
 	}
 
 	return &Domain{
-		services:       service.NewServiceMap(),
-		DomainIdentity: c.DomainIdentity,
-		config:         c,
+		services: service.NewServiceMap(),
+		Identity: c.Identity,
+		config:   c,
 	}, nil
 }
 
 func (d Domain) Run(ctx context.Context) error {
 	system.Logf("I seek to join the Dominion\n")
-	system.Logf(d.DomainIdentity.String())
+	system.Logf(d.Identity.String())
 	system.Logf("The Dominion ever expands!\n")
 
 	// Start Auto Connecting Routines
@@ -72,7 +72,7 @@ func (d Domain) packageServices() []ident.ServiceIdentity {
 	return services
 }
 
-func (d *Domain) updateDominion(ident ident.DominionIdentity) error {
+func (d *Domain) updateDominion(ident ident.Identity) error {
 	if d.dominion == nil {
 		system.Logf("Joining Dominion %v:", ident.Address.String())
 		d.dominion = dominion.NewDominionGuard(ident)

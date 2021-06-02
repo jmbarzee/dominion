@@ -18,12 +18,12 @@ service Domain {
 // HeartbeatRequest contains the identity of the dominion
 message HeartbeatRequest {
 	// Dominion is the requesting dominion
-	DominionIdentity Dominion = 1;
+	Identity Dominion = 1;
 }
 
 message HeartbeatReply {
 	// Domain is the responding domainIdentity
-	DomainIdentity Domain = 1;
+	Identity Domain = 1;
 	// Services is the list of services a Domain currently offers
 	repeated ServiceIdentity Services = 2;
 }

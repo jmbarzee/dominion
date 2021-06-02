@@ -11,14 +11,12 @@ type (
 		Services map[string]ServiceDefinition
 	}
 
-	// ServiceDefinition defines a single service in the service hiarchy
+	// ServiceDefinition defines a single service in the service hierarchy
 	ServiceDefinition struct {
 		// DockerImage is the image:tag of the service which can be pulled and started
 		DockerImage string
 		// Dependencies is the list of service types which this service depends on
 		Dependencies []string
-		// Traits is the list of triats required by a domain to be able to run a service
-		Traits []string
 	}
 )
 
@@ -45,11 +43,6 @@ func (s ServiceDefinition) String() string {
 
 	for _, dependency := range s.Dependencies {
 		msg += dependency + ", "
-	}
-	msg += "], ["
-
-	for _, trait := range s.Traits {
-		msg += trait + ", "
 	}
 	msg += "])"
 

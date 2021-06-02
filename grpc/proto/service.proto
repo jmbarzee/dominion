@@ -14,7 +14,7 @@ service Service {
 // ServiceHeartbeatRequest contains the identity of the Domain
 message ServiceHeartbeatRequest {
 	// Domain is the requesting Domain
-	DomainIdentity Domain = 1;
+	Identity Domain = 1;
 }
 
 message ServiceHeartbeatReply {

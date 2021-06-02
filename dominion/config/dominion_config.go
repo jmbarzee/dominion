@@ -13,7 +13,7 @@ type (
 	// DominionConfig holds all the information required to start a Dominion
 	DominionConfig struct {
 		// DominionIdentity holds identifying information
-		ident.DominionIdentity
+		ident.Identity
 
 		// LogFile is where logs are sent to
 		LogFile string

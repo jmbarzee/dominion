@@ -57,14 +57,12 @@ Loop:
 			system.LogRoutinef(routineName, "Found broadcast - uuid:%v ip:%v port:%v", id, ip, port)
 
 			// Write a temp ident. Should be populated on first heartbeat
-			newDomainGuard := domain.NewDomainGuard(ident.DomainIdentity{
-				Identity: ident.Identity{
-					Address: ident.Address{
-						IP:   ip,
-						Port: port,
-					},
-					ID: id,
+			newDomainGuard := domain.NewDomainGuard(ident.Identity{
+				Address: ident.Address{
+					IP:   ip,
+					Port: port,
 				},
+				ID: id,
 			})
 
 			// Add the new member

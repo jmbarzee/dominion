@@ -9,7 +9,7 @@ import (
 // Dominion implements system.Connectable
 type Dominion struct {
 	//DominionIdentity holds the identifying information of the dominion
-	ident.DominionIdentity
+	ident.Identity
 
 	// conn is the protocol buffer connection to the member
 	Conn *grpc.ClientConn

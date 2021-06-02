@@ -11,7 +11,7 @@ import (
 
 type (
 	// Service offers all the shared features of services
-	// Service should be emmbeded into the implementation of a specific service
+	// Service should be embedded into the implementation of a specific service
 	// the specific service should implement myService.Run(ctx)
 	// and should return myService.HostService() (blocking) as its final line
 	Service struct {
@@ -39,7 +39,7 @@ func NewService(c config.ServiceConfig) (*Service, error) {
 	service := &Service{
 		ServiceIdentity: c.ServiceIdentity,
 		Server:          server,
-		Dominion:        dominion.NewDominionGuard(c.DominionIdentity),
+		Dominion:        dominion.NewDominionGuard(c.Identity),
 		Config:          c,
 	}
 
