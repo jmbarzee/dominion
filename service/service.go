@@ -46,3 +46,7 @@ func NewService(c config.ServiceConfig) (*Service, error) {
 	pb.RegisterServiceServer(service.Server, service)
 	return service, nil
 }
+
+func (s Service) GetService() ident.ServiceIdentity {
+	return s.ServiceIdentity
+}
